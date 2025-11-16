@@ -18,30 +18,43 @@ namespace Express {
 }
 
 /**
- * Middleware que valida el JWT del header Authorization
+ * Middleware que valida el JWT del header Authorization o query parameter
+ * Acepta el token de dos formas:
+ * 1. Header: Authorization: Bearer xxx
+ * 2. Query parameter: ?token=xxx (útil para descargar PDFs en navegador)
+ * 
  * Uso: router.get('/ruta-protegida', autenticar, controller)
  */
 export const autenticar = (req: Request, res: Response, next: NextFunction) => {
 try {
-    // Obtener el token del header Authorization
-    const authHeader = req.headers.authorization;
+    let token: string | undefined;
 
-    if (!authHeader) {
-    res.status(401).json({ 
-        error: 'Token no proporcionado' 
-    });
-    return;
+    // Intentar obtener el token del header Authorization (prioridad)
+    const authHeader = req.headers.authorization;
+    
+    if (authHeader) {
+      // El formato esperado es: "Bearer TOKEN"
+      token = authHeader.startsWith('Bearer ') 
+        ? authHeader.substring(7) 
+        : authHeader;
+    } 
+    // Si no viene en el header, intentar obtenerlo del query parameter
+    else if (req.query.token) {
+      token = req.query.token as string;
     }
 
-    // El formato esperado es: "Bearer TOKEN"
-    const token = authHeader.startsWith('Bearer ') 
-    ? authHeader.substring(7) 
-    : authHeader;
+    // Validar que se encontró un token
+    if (!token) {
+      res.status(401).json({ 
+        error: 'Token no proporcionado' 
+      });
+      return;
+    }
 
     const JWT_SECRET = process.env.JWT_SECRET;
 
     if (!JWT_SECRET) {
-    throw new Error('JWT_SECRET no configurado en .env');
+      throw new Error('JWT_SECRET no configurado en .env');
     }
 
     // Verificar y decodificar el token
@@ -54,22 +67,22 @@ try {
     next();
 } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
-    res.status(401).json({ 
+      res.status(401).json({ 
         error: 'Token inválido' 
-    });
-    return;
+      });
+      return;
     }
     
     if (error instanceof jwt.TokenExpiredError) {
-    res.status(401).json({ 
+      res.status(401).json({ 
         error: 'Token expirado' 
-    });
-    return;
+      });
+      return;
     }
 
     console.error('Error en autenticación:', error);
     res.status(500).json({ 
-    error: 'Error interno del servidor' 
+      error: 'Error interno del servidor' 
     });
 }
 };

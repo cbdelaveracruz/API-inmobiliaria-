@@ -40,10 +40,12 @@ router.post('/', autenticar, crearExpediente);
 
 /**
  * PUT /expedientes/:id/estado
+ * PATCH /expedientes/:id/estado (alias para mobile)
  * Cambia el estado de un expediente
  * Requiere autenticación y rol ADMIN
  * Body: { estado: "PENDIENTE" | "APROBADO" | "RECHAZADO" }
  */
 router.put('/:id/estado', autenticar, esAdmin, cambiarEstadoExpediente);
+router.patch('/:id/estado', autenticar, esAdmin, cambiarEstadoExpediente);
 
 export default router;

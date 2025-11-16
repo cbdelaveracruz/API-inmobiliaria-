@@ -27,6 +27,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/usuarios', usuariosRoutes);
 app.use('/auth', authRoutes);
 app.use('/expedientes', expedientesRoutes);
+app.use('/propiedades', expedientesRoutes); // Alias para compatibilidad con frontend mobile
 app.use('/documentos', documentosRoutes);
 app.use('/', mandatosRoutes); // Incluye rutas /expedientes/:id/mandato y /mandatos/:id/estado
 

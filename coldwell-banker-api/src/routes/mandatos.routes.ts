@@ -11,27 +11,33 @@ const router = Router();
 
 /**
  * POST /expedientes/:id/mandato
+ * POST /propiedades/:id/mandato (alias para mobile)
  * Crea un mandato para un expediente APROBADO
  * Requiere autenticación
  * Body: { plazoDias, monto, observaciones? }
  */
 router.post('/expedientes/:id/mandato', autenticar, crearMandatoDesdeExpediente);
+router.post('/propiedades/:id/mandato', autenticar, crearMandatoDesdeExpediente);
 
 /**
  * GET /expedientes/:id/mandato/pdf
+ * GET /propiedades/:id/mandato/pdf (alias para mobile)
  * Genera y descarga el PDF del mandato dinámicamente
  * Requiere autenticación
  * ⚠️ IMPORTANTE: Esta ruta DEBE ir ANTES de GET /expedientes/:id/mandato
  */
 router.get('/expedientes/:id/mandato/pdf', autenticar, descargarPdfMandato);
+router.get('/propiedades/:id/mandato/pdf', autenticar, descargarPdfMandato);
 
 /**
  * GET /expedientes/:id/mandato
+ * GET /propiedades/:id/mandato (alias para mobile)
  * Obtiene el mandato de un expediente
  * Requiere autenticación
  * ⚠️ IMPORTANTE: Esta ruta debe ir DESPUÉS de las rutas más específicas (/pdf)
  */
 router.get('/expedientes/:id/mandato', autenticar, obtenerMandatoPorExpediente);
+router.get('/propiedades/:id/mandato', autenticar, obtenerMandatoPorExpediente);
 
 /**
  * PUT /mandatos/:id/estado

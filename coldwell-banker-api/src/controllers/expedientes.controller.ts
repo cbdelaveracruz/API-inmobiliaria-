@@ -276,9 +276,19 @@ try {
 };
 
 /**
- * POST /expedientes
- * Crea un nuevo expediente
+ * POST /expedientes (y /propiedades como alias)
+ * Crea un nuevo expediente/propiedad
  * El usuarioId se toma del token (req.usuario.id)
+ * 
+ * Campos requeridos:
+ * - titulo: string (nombre de la propiedad)
+ * - propietarioNombre: string (nombre del dueño)
+ * 
+ * Campos opcionales:
+ * - descripcion: string
+ * - direccion: string
+ * - api: string (número de API)
+ * - emails: string (emails separados por coma)
  */
 export const crearExpediente = async (req: Request, res: Response) => {
 try {

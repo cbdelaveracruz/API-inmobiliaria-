@@ -85,6 +85,7 @@ model Mandato {
   expedienteId  Int            @unique  // Un expediente solo puede tener un mandato
   plazoDias     Int                     // Plazo en días
   monto         Float                   // Monto del mandato
+  moneda        String         @default("ARS") // Moneda del monto (ARS o USD)
   estado        MandatoEstado  @default(BORRADOR)
   observaciones String?                 // Observaciones opcionales
   firmadoPor    String?                 // Nombre o email de quien firmó

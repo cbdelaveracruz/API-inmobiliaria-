@@ -55,6 +55,10 @@ const NuevaPropiedad: React.FC = () => {
       setError('El nombre del propietario es obligatorio');
       return;
     }
+    if (numeroApi.trim() && numeroApi.trim().length !== 16) {
+      setError('El número de API debe tener exactamente 16 dígitos');
+      return;
+    }
 
     setLoading(true);
 
@@ -183,26 +187,34 @@ const NuevaPropiedad: React.FC = () => {
                 id="api"
                 type="text"
                 value={numeroApi}
-                onChange={(e) => setNumeroApi(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  if (value.length <= 16) {
+                    setNumeroApi(value);
+                  }
+                }}
                 disabled={loading}
                 className={styles.input}
-                placeholder="Ej: 12345678"
-                maxLength={100}
+                placeholder="16 dígitos: 1234123412341234"
+                maxLength={16}
               />
+              {numeroApi && (
+                <span className={styles.charCount}>{numeroApi.length}/16</span>
+              )}
             </div>
 
             <div className={styles.inputGroup}>
               <label htmlFor="emails" className={styles.label}>
-                Emails relacionados <span className={styles.optional}>(opcional)</span>
+                Email del propietario <span className={styles.optional}>(opcional)</span>
               </label>
               <input
                 id="emails"
-                type="text"
+                type="email"
                 value={emails}
                 onChange={(e) => setEmails(e.target.value)}
                 disabled={loading}
                 className={styles.input}
-                placeholder="Ej: cliente@email.com, asesor@email.com"
+                placeholder="Ej: propietario@email.com"
                 maxLength={300}
               />
             </div>

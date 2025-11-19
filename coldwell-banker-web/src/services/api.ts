@@ -68,12 +68,12 @@ export const crearMandato = (
   data: { plazoDias: number; monto: number; observaciones?: string }
 ) => api.post(`/expedientes/${expedienteId}/mandato`, data);
 
-// Helper para descargar PDF del mandato
-export const descargarMandatoPdf = async (
+// Helper para descargar documento Word del mandato
+export const descargarMandatoWord = async (
   expedienteId: number,
   tituloExpediente: string
 ): Promise<void> => {
-  const response = await api.get(`/expedientes/${expedienteId}/mandato/pdf`, {
+  const response = await api.get(`/expedientes/${expedienteId}/mandato/word`, {
     responseType: 'blob',
   });
 
@@ -85,7 +85,7 @@ export const descargarMandatoPdf = async (
     .replace(/[^a-z0-9]+/g, '_') // reemplazar espacios/símbolos por _
     .replace(/^_+|_+$/g, ''); // quitar _ al inicio/final
 
-  const filename = `mandato_${expedienteId}_${slug}.pdf`;
+  const filename = `mandato_${expedienteId}_${slug}.docx`;
 
   // Crear URL del blob y descargar
   const url = window.URL.createObjectURL(new Blob([response.data]));

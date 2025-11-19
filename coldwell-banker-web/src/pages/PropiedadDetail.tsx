@@ -1,7 +1,7 @@
 // src/pages/PropiedadDetail.tsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import api, { descargarMandatoPdf } from '../services/api';
+import api, { descargarMandatoWord } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ChangeStatusModal from '../components/ChangeStatusModal';
 import styles from './PropiedadDetail.module.css';
@@ -24,6 +24,7 @@ interface Mandato {
   id: number;
   plazoDias: number;
   monto: number;
+  moneda?: 'ARS' | 'USD';
   observaciones?: string | null;
   createdAt: string;
 }
@@ -50,25 +51,19 @@ const PropiedadDetail = () => {
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [downloadError, setDownloadError] = useState('');
-  const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [downloadingWord, setDownloadingWord] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
   // Verificar si el usuario puede cambiar el estado
   const canChangeStatus = user?.rol === 'ADMIN' || user?.rol === 'REVISOR';
 
-  // Verificar si el usuario puede crear un mandato
-  const canCreateMandato = 
-    user?.rol === 'ASESOR' && 
-    propiedad?.estado === 'APROBADO' && 
-    !propiedad?.mandato;
-
   // Verificar si el usuario puede descargar el mandato
   const canDownloadMandato = 
     propiedad?.mandato &&
     (user?.rol === 'ADMIN' || 
-     user?.rol === 'REVISOR' || 
-     (user?.rol === 'ASESOR' && propiedad?.asesor?.id === user?.id));
+    user?.rol === 'REVISOR' || 
+    (user?.rol === 'ASESOR' && propiedad?.asesor?.id === user?.id));
 
   useEffect(() => {
     if (id) {
@@ -91,6 +86,16 @@ const PropiedadDetail = () => {
         setTimeout(() => setSuccessMessage(''), 3000);
       }
       
+      // Hacer scroll a la sección de mandato si se indica
+      if (location.state?.scrollToMandato) {
+        setTimeout(() => {
+          const mandatoSection = document.querySelector('[data-section="mandato"]');
+          if (mandatoSection) {
+            mandatoSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 500);
+      }
+      
       // Limpiar el estado para que no se vuelva a ejecutar
       navigate(location.pathname, { replace: true, state: {} });
     }
@@ -109,25 +114,25 @@ const PropiedadDetail = () => {
     }
   };
 
-  const handleDownloadPdf = async () => {
+  const handleDownloadWord = async () => {
     if (!id || !propiedad) return;
     
-    setDownloadingPdf(true);
+    setDownloadingWord(true);
     setDownloadError('');
     
     try {
-      await descargarMandatoPdf(Number(id), propiedad.titulo);
+      await descargarMandatoWord(Number(id), propiedad.titulo);
     } catch (err: any) {
       const errorMsg = err.response?.status === 403
         ? 'No tenés permisos para descargar este mandato'
         : err.response?.status === 404
         ? 'No se encontró el mandato'
-        : 'No se pudo descargar el PDF. Intentá nuevamente.';
+        : 'No se pudo descargar el documento. Intentá nuevamente.';
       
       setDownloadError(errorMsg);
       setTimeout(() => setDownloadError(''), 5000);
     } finally {
-      setDownloadingPdf(false);
+      setDownloadingWord(false);
     }
   };
 
@@ -160,18 +165,6 @@ const PropiedadDetail = () => {
       </div>
     );
   }
-
-  // helper para color según estado
-  const getEstadoColor = (estado: string) => {
-    switch (estado) {
-      case 'APROBADO':
-        return '#10b981';
-      case 'RECHAZADO':
-        return '#dc2626';
-      default:
-        return '#6b7280';
-    }
-  };
 
   const handleStatusChange = (nuevoEstado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO', observaciones: string | null) => {
     // Actualizar el estado local de la propiedad sin recargar toda la página
@@ -213,14 +206,6 @@ const PropiedadDetail = () => {
           <button onClick={() => navigate('/propiedades')} className={styles.backButton}>
             ← Volver
           </button>
-          {!canChangeStatus && (
-            <button 
-              onClick={() => navigate(`/propiedades/${id}/upload`)} 
-              className={styles.uploadButton}
-            >
-              📄 Subir documento
-            </button>
-          )}
           {canChangeStatus && (
             <div className={styles.adminActions}>
               <button 
@@ -284,23 +269,10 @@ const PropiedadDetail = () => {
 
           {/* Sección de Mandato - Solo visible para ASESOR o cuando ya existe mandato */}
           {(user?.rol === 'ASESOR' || propiedad.mandato) && (
-            <div className={styles.mandatoSection}>
+            <div className={styles.mandatoSection} data-section="mandato">
               <h3>Mandato</h3>
               {propiedad.mandato ? (
               <div className={styles.mandatoExistente}>
-                <div className={styles.mandatoHeader}>
-                  <span className={styles.mandatoIcon}>📄</span>
-                  <span>Mandato generado</span>
-                  {canDownloadMandato && (
-                    <button 
-                      onClick={handleDownloadPdf}
-                      disabled={downloadingPdf}
-                      className={styles.downloadPdfButton}
-                    >
-                      {downloadingPdf ? '⏳ Descargando...' : '⬇ Descargar PDF'}
-                    </button>
-                  )}
-                </div>
                 <div className={styles.mandatoDetails}>
                   <div className={styles.mandatoRow}>
                     <span>Plazo:</span>
@@ -308,7 +280,9 @@ const PropiedadDetail = () => {
                   </div>
                   <div className={styles.mandatoRow}>
                     <span>Monto:</span>
-                    <strong>${propiedad.mandato.monto.toLocaleString('es-AR')} ARS</strong>
+                    <strong>
+                      ${propiedad.mandato.monto.toLocaleString('es-AR')} {propiedad.mandato.moneda || 'ARS'}
+                    </strong>
                   </div>
                   {propiedad.mandato.observaciones && (
                     <div className={styles.mandatoRow}>
@@ -318,9 +292,29 @@ const PropiedadDetail = () => {
                   )}
                   <div className={styles.mandatoRow}>
                     <span>Fecha de creación:</span>
-                    <span>{new Date(propiedad.mandato.createdAt).toLocaleDateString('es-AR')}</span>
+                    <span>{new Date(propiedad.mandato.createdAt).toLocaleDateString('es-AR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}</span>
                   </div>
                 </div>
+                {canDownloadMandato && (
+                  <div className={styles.mandatoActions}>
+                    <button 
+                      onClick={handleDownloadWord}
+                      disabled={downloadingWord}
+                      className={styles.downloadMandatoButton}
+                    >
+                      <span style={{ fontSize: '1.3rem', marginRight: '8px' }}>📥</span>
+                      <span style={{ fontWeight: 'bold' }}>
+                        {downloadingWord ? 'DESCARGANDO...' : 'DESCARGAR MANDATO'}
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className={styles.mandatoNoGenerado}>
@@ -372,104 +366,73 @@ const PropiedadDetail = () => {
             </div>
           )}
 
-          {/* Sección de Mandato - DESTACADA */}
-          {canDownloadMandato && propiedad.mandato && (
-            <div className={styles.mandatoSection}>
-              <div className={styles.mandatoHeader}>
-                <div className={styles.mandatoTitleGroup}>
-                  <span className={styles.mandatoIcon}>📄</span>
-                  <h3 className={styles.mandatoTitle}>Mandato</h3>
-                </div>
-                <button 
-                  onClick={handleDownloadPdf}
-                  disabled={downloadingPdf}
-                  className={styles.downloadPdfButton}
-                  title="Descargar mandato en PDF"
-                >
-                  {downloadingPdf ? '⏳ Descargando…' : '� Descargar mandato'}
-                </button>
-              </div>
-              <div className={styles.mandatoBox}>
-                <div className={styles.mandatoRow}>
-                  <span className={styles.mandatoLabel}>Plazo:</span>
-                  <span className={styles.mandatoValue}>{propiedad.mandato.plazoDias} días</span>
-                </div>
-                <div className={styles.mandatoRow}>
-                  <span className={styles.mandatoLabel}>Monto:</span>
-                  <span className={styles.mandatoValue}>
-                    ${propiedad.mandato.monto.toLocaleString('es-AR')} ARS
-                  </span>
-                </div>
-                {propiedad.mandato.observaciones && (
-                  <div className={styles.mandatoRow}>
-                    <span className={styles.mandatoLabel}>Observaciones:</span>
-                    <span className={styles.mandatoValue}>{propiedad.mandato.observaciones}</span>
-                  </div>
-                )}
-                <div className={styles.mandatoRow}>
-                  <span className={styles.mandatoLabel}>Fecha de creación:</span>
-                  <span className={styles.mandatoValue}>
-                    {new Date(propiedad.mandato.createdAt).toLocaleDateString('es-AR', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Sección de Documentos */}
           <div className={styles.section}>
             <h3>Documentos</h3>
             
             {propiedad.documentos && propiedad.documentos.length > 0 ? (
-              <div className={styles.documentosTable}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Tipo</th>
-                      <th>Fecha de carga</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {propiedad.documentos.map((doc) => (
-                      <tr key={doc.id}>
-                        <td>{doc.tipo}</td>
-                        <td>{new Date(doc.createdAt).toLocaleDateString('es-AR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}</td>
-                        <td>
-                          <a 
-                            href={`${import.meta.env.VITE_API_URL}/${doc.rutaArchivo}`}
-                            target="_blank" 
-                            rel="noreferrer"
-                            className={styles.viewDocumentButton}
-                          >
-                            📄 Ver Documento
-                          </a>
-                        </td>
+              <>
+                <div className={styles.uploadDocumentCallout}>
+                  <div className={styles.calloutContent}>
+                    <span className={styles.calloutIcon}>📎</span>
+                    <span className={styles.calloutText}>¿Necesitas agregar más documentación?</span>
+                  </div>
+                  <button 
+                    onClick={() => navigate(`/propiedades/${id}/upload`)}
+                    className={styles.uploadDocumentButton}
+                  >
+                    <span style={{ fontSize: '1.3rem', marginRight: '8px' }}>📄</span>
+                    <span style={{ fontWeight: 'bold' }}>SUBIR DOCUMENTACIÓN</span>
+                  </button>
+                </div>
+                
+                <div className={styles.documentosTable}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Tipo</th>
+                        <th>Fecha de carga</th>
+                        <th>Acciones</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {propiedad.documentos.map((doc) => (
+                        <tr key={doc.id}>
+                          <td>{doc.tipo}</td>
+                          <td>{new Date(doc.createdAt).toLocaleDateString('es-AR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}</td>
+                          <td>
+                            <a 
+                              href={`${import.meta.env.VITE_API_URL}/${doc.rutaArchivo}`}
+                              target="_blank" 
+                              rel="noreferrer"
+                              className={styles.viewDocumentButton}
+                            >
+                              📄 Ver Documento
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             ) : (
               <div className={styles.noDocumentsBox}>
-                <p>No hay documentos cargados aún.</p>
+                <div className={styles.emptyStateIcon}>📂</div>
+                <p className={styles.emptyStateTitle}>No hay documentos cargados aún</p>
+                <p className={styles.emptyStateSubtitle}>Sube tu primera documentación para esta propiedad</p>
                 <button 
                   onClick={() => navigate(`/propiedades/${id}/upload`)}
                   className={styles.uploadFirstButton}
                 >
-                  📄 Subir el primer documento
+                  <span style={{ fontSize: '1.5rem', marginRight: '10px' }}>📄</span>
+                  <span style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>SUBIR DOCUMENTACIÓN</span>
                 </button>
               </div>
             )}

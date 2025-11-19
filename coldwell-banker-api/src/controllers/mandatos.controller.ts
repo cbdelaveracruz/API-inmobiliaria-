@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '../prisma';
 import path from 'path';
 import fs from 'fs';
-import PDFDocument from 'pdfkit';
+import { Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel, UnderlineType } from 'docx';
 
 // Estados permitidos del mandato
 const ESTADOS_MANDATO = ['BORRADOR', 'ENVIADO', 'FIRMADO', 'ANULADO'] as const;
@@ -20,7 +20,7 @@ type EstadoMandato = typeof ESTADOS_MANDATO[number];
 export const crearMandatoDesdeExpediente = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { plazoDias, monto, observaciones } = req.body;
+    const { plazoDias, monto, observaciones, moneda } = req.body;
     const expedienteId = parseInt(id);
 
     // Validar ID del expediente
@@ -107,6 +107,7 @@ export const crearMandatoDesdeExpediente = async (req: Request, res: Response) =
         expedienteId,
         plazoDias,
         monto,
+        moneda: moneda || 'ARS', // Usar la moneda recibida o ARS por defecto
         observaciones: observaciones?.trim() || null,
         estado: 'BORRADOR'
       },
@@ -302,14 +303,14 @@ export const actualizarEstadoMandato = async (req: Request, res: Response) => {
 };
 
 /**
- * GET /expedientes/:id/mandato/pdf
- * Genera y descarga el PDF del mandato dinámicamente
+ * GET /expedientes/:id/mandato/word
+ * Genera y descarga el documento Word del mandato dinámicamente
  * 
  * Permisos:
- * - ASESOR: Solo puede descargar PDFs de mandatos de sus expedientes
- * - REVISOR/ADMIN: Pueden descargar PDFs de cualquier mandato
+ * - ASESOR: Solo puede descargar documentos de mandatos de sus expedientes
+ * - REVISOR/ADMIN: Pueden descargar documentos de cualquier mandato
  */
-export const descargarPdfMandato = async (req: Request, res: Response) => {
+export const descargarWordMandato = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const expedienteId = parseInt(id);
@@ -335,11 +336,11 @@ export const descargarPdfMandato = async (req: Request, res: Response) => {
     // Construir el where según el rol
     const where: any = { id: expedienteId };
     
-    // Si es ASESOR, solo puede descargar PDFs de sus expedientes
+    // Si es ASESOR, solo puede descargar documentos de sus expedientes
     if (usuario.rol === 'ASESOR') {
       where.asesorId = usuario.id;
     }
-    // ADMIN y REVISOR pueden descargar PDFs de cualquier mandato
+    // ADMIN y REVISOR pueden descargar documentos de cualquier mandato
 
     // Verificar que el expediente existe y el usuario tiene permisos
     const expediente = await prisma.expediente.findUnique({
@@ -372,132 +373,223 @@ export const descargarPdfMandato = async (req: Request, res: Response) => {
 
     const mandato = expediente.mandato;
 
-    // Generar el PDF dinámicamente
-    const doc = new PDFDocument({
-      size: 'A4',
-      margins: { top: 50, bottom: 50, left: 50, right: 50 }
-    });
-
-    // Configurar headers para descarga
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="mandato-expediente-${expedienteId}.pdf"`);
-
-    // Pipe del PDF a la respuesta
-    doc.pipe(res);
-
     // ==========================================
-    // CONTENIDO DEL PDF
+    // CREAR DOCUMENTO WORD
     // ==========================================
 
-    // Logo o header (opcional)
-    doc.fontSize(24)
-       .font('Helvetica-Bold')
-       .text('MANDATO DE VENTA', { align: 'center' })
-       .moveDown(0.5);
+    // Crear array de párrafos para el documento
+    const documentParagraphs: Paragraph[] = [];
 
-    doc.fontSize(12)
-       .font('Helvetica')
-       .text('Coldwell Banker', { align: 'center' })
-       .moveDown(2);
+    // Título principal
+    documentParagraphs.push(
+      new Paragraph({
+        text: 'MANDATO DE VENTA',
+        heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 200 }
+      })
+    );
 
-    // Información del expediente
-    doc.fontSize(14)
-       .font('Helvetica-Bold')
-       .text('Datos del Expediente', { underline: true })
-       .moveDown(0.5);
+    // Subtítulo Coldwell Banker
+    documentParagraphs.push(
+      new Paragraph({
+        text: 'Coldwell Banker',
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 400 }
+      })
+    );
 
-    doc.fontSize(11)
-       .font('Helvetica');
+    // Sección: Datos del Expediente
+    documentParagraphs.push(
+      new Paragraph({
+        text: 'Datos del Expediente',
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 200, after: 200 }
+      })
+    );
 
-    doc.text(`Expediente N°: ${expediente.id}`, { continued: false });
-    doc.text(`Título: ${expediente.titulo}`, { continued: false });
-    doc.text(`Propietario: ${expediente.propietarioNombre}`, { continued: false });
-    doc.text(`Estado: ${expediente.estado}`, { continued: false });
-    
+    documentParagraphs.push(
+      new Paragraph({
+        children: [
+          new TextRun({ text: `Expediente N°: ${expediente.id}`, break: 1 }),
+          new TextRun({ text: `Título: ${expediente.titulo}`, break: 1 }),
+          new TextRun({ text: `Propietario: ${expediente.propietarioNombre}`, break: 1 }),
+          new TextRun({ text: `Estado: ${expediente.estado}`, break: 1 }),
+        ],
+        spacing: { after: 200 }
+      })
+    );
+
     if (expediente.descripcion) {
-      doc.text(`Descripción: ${expediente.descripcion}`, { continued: false });
+      documentParagraphs.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: `Descripción: ${expediente.descripcion}`, break: 1 }),
+          ],
+          spacing: { after: 200 }
+        })
+      );
     }
 
-    doc.moveDown(1.5);
+    // Sección: Datos del Mandato
+    documentParagraphs.push(
+      new Paragraph({
+        text: 'Datos del Mandato',
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 300, after: 200 }
+      })
+    );
 
-    // Información del mandato
-    doc.fontSize(14)
-       .font('Helvetica-Bold')
-       .text('Datos del Mandato', { underline: true })
-       .moveDown(0.5);
+    // Obtener la moneda del mandato
+    const moneda = mandato.moneda || 'ARS';
+    const montoFormateado = `$${mandato.monto.toLocaleString('es-AR')} ${moneda}`;
 
-    doc.fontSize(11)
-       .font('Helvetica');
+    documentParagraphs.push(
+      new Paragraph({
+        children: [
+          new TextRun({ text: `Mandato N°: ${mandato.id}`, break: 1 }),
+          new TextRun({ text: `Plazo: ${mandato.plazoDias} días`, break: 1 }),
+          new TextRun({ text: `Monto: ${montoFormateado}`, break: 1 }),
+          new TextRun({ text: `Estado: ${mandato.estado}`, break: 1 }),
+        ],
+        spacing: { after: 200 }
+      })
+    );
 
-    doc.text(`Mandato N°: ${mandato.id}`, { continued: false });
-    doc.text(`Plazo: ${mandato.plazoDias} días`, { continued: false });
-    doc.text(`Monto: $${mandato.monto.toLocaleString('es-AR')} ARS`, { continued: false });
-    doc.text(`Estado: ${mandato.estado}`, { continued: false });
-    
     if (mandato.observaciones) {
-      doc.text(`Observaciones: ${mandato.observaciones}`, { continued: false });
+      documentParagraphs.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: `Observaciones: ${mandato.observaciones}`, break: 1 }),
+          ],
+          spacing: { after: 200 }
+        })
+      );
     }
-
-    doc.moveDown(1);
 
     // Fecha de creación
     const createdAt = new Date(mandato.createdAt);
-    doc.text(`Fecha de creación: ${createdAt.toLocaleDateString('es-AR')} ${createdAt.toLocaleTimeString('es-AR')}`, { continued: false });
+    documentParagraphs.push(
+      new Paragraph({
+        children: [
+          new TextRun({ 
+            text: `Fecha de creación: ${createdAt.toLocaleDateString('es-AR')} ${createdAt.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`, 
+            break: 1 
+          }),
+        ],
+        spacing: { after: 200 }
+      })
+    );
 
     // Si está firmado, mostrar datos de firma
     if (mandato.estado === 'FIRMADO' && mandato.firmadoPor) {
-      doc.moveDown(1);
-      doc.fontSize(11)
-         .font('Helvetica-Bold')
-         .text('Firma:', { continued: false })
-         .font('Helvetica');
-      
-      doc.text(`Firmado por: ${mandato.firmadoPor}`, { continued: false });
-      
+      documentParagraphs.push(
+        new Paragraph({
+          text: 'Firma',
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 200, after: 100 }
+        })
+      );
+
+      const firmaParagraph = [
+        new TextRun({ text: `Firmado por: ${mandato.firmadoPor}`, break: 1 }),
+      ];
+
       if (mandato.firmadoFecha) {
         const firmadoFecha = new Date(mandato.firmadoFecha);
-        doc.text(`Fecha de firma: ${firmadoFecha.toLocaleDateString('es-AR')} ${firmadoFecha.toLocaleTimeString('es-AR')}`, { continued: false });
+        firmaParagraph.push(
+          new TextRun({ 
+            text: `Fecha de firma: ${firmadoFecha.toLocaleDateString('es-AR')} ${firmadoFecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`, 
+            break: 1 
+          })
+        );
       }
-    }
 
-    doc.moveDown(2);
+      documentParagraphs.push(
+        new Paragraph({
+          children: firmaParagraph,
+          spacing: { after: 200 }
+        })
+      );
+    }
 
     // Información del asesor
     if (expediente.asesor) {
-      doc.fontSize(14)
-         .font('Helvetica-Bold')
-         .text('Asesor Responsable', { underline: true })
-         .moveDown(0.5);
+      documentParagraphs.push(
+        new Paragraph({
+          text: 'Asesor Responsable',
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 300, after: 200 }
+        })
+      );
 
-      doc.fontSize(11)
-         .font('Helvetica');
-
-      doc.text(`Nombre: ${expediente.asesor.nombre}`, { continued: false });
-      doc.text(`Email: ${expediente.asesor.email}`, { continued: false });
+      documentParagraphs.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: `Nombre: ${expediente.asesor.nombre}`, break: 1 }),
+            new TextRun({ text: `Email: ${expediente.asesor.email}`, break: 1 }),
+          ],
+          spacing: { after: 400 }
+        })
+      );
     }
 
     // Pie de página
-    doc.moveDown(3);
-    doc.fontSize(9)
-       .fillColor('#666666')
-       .font('Helvetica')
-       .text(`Este documento es estilizado automáticamente por el sistema de gestión de expedientes.`, { 
-         align: 'center'
-       })
-       .text(`Generado el ${new Date().toLocaleDateString('es-AR')} a las ${new Date().toLocaleTimeString('es-AR')}`, {
-         align: 'center'
-       });
+    documentParagraphs.push(
+      new Paragraph({
+        children: [
+          new TextRun({ 
+            text: `Este documento es estilizado automáticamente por el sistema de gestión de expedientes.`,
+            italics: true,
+            size: 18,
+            color: '666666'
+          })
+        ],
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 400, after: 100 }
+      })
+    );
 
-    // Finalizar el PDF
-    doc.end();
+    documentParagraphs.push(
+      new Paragraph({
+        children: [
+          new TextRun({ 
+            text: `Generado el ${new Date().toLocaleDateString('es-AR')} a las ${new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`,
+            italics: true,
+            size: 18,
+            color: '666666'
+          })
+        ],
+        alignment: AlignmentType.CENTER
+      })
+    );
+
+    // Crear el documento
+    const doc = new Document({
+      sections: [{
+        properties: {},
+        children: documentParagraphs
+      }]
+    });
+
+    // Generar el buffer del documento
+    const buffer = await Packer.toBuffer(doc);
+
+    // Configurar headers para descarga
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    res.setHeader('Content-Disposition', `attachment; filename="mandato_${expedienteId}_${expediente.titulo.replace(/\s+/g, '_')}.docx"`);
+    res.setHeader('Content-Length', buffer.length.toString());
+
+    // Enviar el archivo
+    res.send(buffer);
 
   } catch (error) {
-    console.error('Error al generar PDF del mandato:', error);
+    console.error('Error al generar documento Word del mandato:', error);
     
     // Solo enviar error si no se envió la respuesta aún
     if (!res.headersSent) {
       res.status(500).json({
-        error: 'Error interno del servidor al generar el PDF del mandato'
+        error: 'Error interno del servidor al generar el documento del mandato'
       });
     }
   }

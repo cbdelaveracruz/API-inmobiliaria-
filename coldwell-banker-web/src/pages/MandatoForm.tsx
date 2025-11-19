@@ -8,6 +8,7 @@ const MandatoForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [plazoDias, setPlazoDias] = useState('');
   const [monto, setMonto] = useState('');
+  const [moneda, setMoneda] = useState<'ARS' | 'USD'>('ARS');
   const [observaciones, setObservaciones] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -42,9 +43,10 @@ const MandatoForm: React.FC = () => {
     try {
       const expedienteId = Number(id);
       
-      const data: { plazoDias: number; monto: number; observaciones?: string } = {
+      const data: { plazoDias: number; monto: number; moneda: 'ARS' | 'USD'; observaciones?: string } = {
         plazoDias: plazoDiasNum,
         monto: montoNum,
+        moneda: moneda,
       };
 
       // Solo agregar observaciones si no está vacío
@@ -57,10 +59,10 @@ const MandatoForm: React.FC = () => {
       // Mostrar mensaje de éxito
       setSuccess('✅ Mandato creado correctamente');
 
-      // Esperar 1 segundo y redirigir al detalle
+      // Esperar 1 segundo y redirigir al detalle con scroll a la sección de mandato
       setTimeout(() => {
-        navigate(`/expedientes/${expedienteId}`, { 
-          state: { refetch: true, message: 'Mandato creado exitosamente' }
+        navigate(`/propiedades/${expedienteId}`, { 
+          state: { refetch: true, message: 'Mandato creado exitosamente', scrollToMandato: true }
         });
       }, 1000);
 
@@ -76,7 +78,7 @@ const MandatoForm: React.FC = () => {
   };
 
   const handleCancel = () => {
-    navigate(`/expedientes/${id}`);
+    navigate(`/propiedades/${id}`);
   };
 
   return (
@@ -108,8 +110,27 @@ const MandatoForm: React.FC = () => {
             </div>
 
             <div className={styles.inputGroup}>
+              <label htmlFor="moneda" className={styles.label}>
+                Moneda <span className={styles.required}>*</span>
+              </label>
+              <select
+                id="moneda"
+                value={moneda}
+                onChange={(e) => setMoneda(e.target.value as 'ARS' | 'USD')}
+                disabled={loading}
+                className={styles.select}
+              >
+                <option value="ARS">🇦🇷 Pesos Argentinos (ARS)</option>
+                <option value="USD">💵 Dólares Estadounidenses (USD)</option>
+              </select>
+              <span className={styles.hint}>
+                Seleccioná la moneda en la que se expresará el monto
+              </span>
+            </div>
+
+            <div className={styles.inputGroup}>
               <label htmlFor="monto" className={styles.label}>
-                Monto (ARS) <span className={styles.required}>*</span>
+                Monto ({moneda}) <span className={styles.required}>*</span>
               </label>
               <input
                 id="monto"
@@ -118,10 +139,10 @@ const MandatoForm: React.FC = () => {
                 onChange={(e) => setMonto(e.target.value)}
                 disabled={loading}
                 className={styles.input}
-                placeholder="Ej: 1500000"
+                placeholder={moneda === 'ARS' ? 'Ej: 1500000' : 'Ej: 50000'}
               />
               <span className={styles.hint}>
-                Ingresá el monto en pesos argentinos (sin puntos ni comas)
+                Ingresá el monto en {moneda === 'ARS' ? 'pesos argentinos' : 'dólares'} (sin puntos ni comas)
               </span>
             </div>
 

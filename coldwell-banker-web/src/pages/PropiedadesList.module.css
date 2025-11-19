@@ -1,5 +1,108 @@
 /* src/pages/ExpedientesList.module.css - Refactorizado para usar UI kit */
 
+/* --- Filtros --- */
+.filterContainer {
+  margin-bottom: var(--space-xl);
+  padding: var(--space-2xl);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(147, 51, 234, 0.08) 100%);
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.filterContainer::before {
+  content: '🔍';
+  position: absolute;
+  top: var(--space-lg);
+  left: var(--space-lg);
+  font-size: 2rem;
+  opacity: 0.7;
+}
+
+.filterTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: var(--space-xl);
+  padding-left: 3.5rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  letter-spacing: 0.5px;
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-xl);
+  margin-bottom: var(--space-md);
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.filterLabel {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: 0.3px;
+  margin-bottom: var(--space-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.filterInput {
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.filterInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+.filterInput:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.filterInput::placeholder {
+  color: var(--text-muted);
+  font-style: normal;
+  font-size: 0.95rem;
+}
+
+.filterActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-lg);
+  border-top: 2px solid rgba(59, 130, 246, 0.2);
+  margin-top: var(--space-lg);
+}
+
+.filterCount {
+  font-size: 1.1rem;
+  color: var(--primary);
+  font-weight: 700;
+  background: rgba(59, 130, 246, 0.15);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+}
+
 /* --- Loading & Error States --- */
 .loadingContainer,
 .errorContainer {
@@ -137,6 +240,16 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filterActions {
+    flex-direction: column;
+    gap: var(--space-sm);
+    align-items: stretch;
+  }
+
   .grid {
     grid-template-columns: 1fr;
   }

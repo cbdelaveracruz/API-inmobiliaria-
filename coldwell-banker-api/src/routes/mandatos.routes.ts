@@ -3,7 +3,7 @@ import {
   crearMandatoDesdeExpediente,
   obtenerMandatoPorExpediente,
   actualizarEstadoMandato,
-  descargarPdfMandato
+  descargarWordMandato
 } from '../controllers/mandatos.controller';
 import { autenticar, esAdmin } from '../middlewares/auth.middleware';
 
@@ -20,14 +20,14 @@ router.post('/expedientes/:id/mandato', autenticar, crearMandatoDesdeExpediente)
 router.post('/propiedades/:id/mandato', autenticar, crearMandatoDesdeExpediente);
 
 /**
- * GET /expedientes/:id/mandato/pdf
- * GET /propiedades/:id/mandato/pdf (alias para mobile)
- * Genera y descarga el PDF del mandato dinámicamente
+ * GET /expedientes/:id/mandato/word
+ * GET /propiedades/:id/mandato/word (alias para mobile)
+ * Genera y descarga el documento Word del mandato dinámicamente
  * Requiere autenticación
  * ⚠️ IMPORTANTE: Esta ruta DEBE ir ANTES de GET /expedientes/:id/mandato
  */
-router.get('/expedientes/:id/mandato/pdf', autenticar, descargarPdfMandato);
-router.get('/propiedades/:id/mandato/pdf', autenticar, descargarPdfMandato);
+router.get('/expedientes/:id/mandato/word', autenticar, descargarWordMandato);
+router.get('/propiedades/:id/mandato/word', autenticar, descargarWordMandato);
 
 /**
  * GET /expedientes/:id/mandato

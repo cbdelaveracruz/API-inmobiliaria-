@@ -2,10 +2,12 @@
 import { useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import PageContainer from '../layout/PageContainer';
+import { useAuth } from '../context/AuthContext';
 import styles from './Home.module.css';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <PageContainer title="">
@@ -20,7 +22,7 @@ const Home = () => {
           </div>
           
           <h1 className={styles.mainTitle}>
-            Bienvenido al Sistema de Coldwell Banker
+            Bienvenido{user ? ` ${user.nombre}` : ''} al Sistema de Coldwell Banker
           </h1>
           
           <p className={styles.subtitle}>

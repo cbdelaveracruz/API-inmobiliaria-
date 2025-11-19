@@ -20,6 +20,7 @@ interface Mandato {
   id: number;
   plazo: string;
   monto: number;
+  moneda?: 'ARS' | 'USD';
   observaciones?: string | null;
   createdAt: string;
 }
@@ -37,6 +38,7 @@ interface Propiedad {
 
 const PropiedadesList: React.FC = () => {
   const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
+  const [propiedadesFiltradas, setPropiedadesFiltradas] = useState<Propiedad[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
@@ -44,6 +46,12 @@ const PropiedadesList: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Estados de filtros
+  const [filtroNombre, setFiltroNombre] = useState('');
+  const [filtroPropietario, setFiltroPropietario] = useState('');
+  const [filtroAsesor, setFiltroAsesor] = useState('');
+  const [filtroFecha, setFiltroFecha] = useState('');
 
   useEffect(() => {
     loadPropiedades(page);
@@ -92,6 +100,55 @@ const PropiedadesList: React.FC = () => {
     }
   };
 
+  // Efecto para aplicar filtros
+  useEffect(() => {
+    aplicarFiltros();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [propiedades, filtroNombre, filtroPropietario, filtroAsesor, filtroFecha]);
+
+  const aplicarFiltros = () => {
+    let resultado = [...propiedades];
+
+    // Filtro por nombre de propiedad
+    if (filtroNombre.trim()) {
+      resultado = resultado.filter(prop =>
+        prop.titulo.toLowerCase().includes(filtroNombre.toLowerCase())
+      );
+    }
+
+    // Filtro por propietario
+    if (filtroPropietario.trim()) {
+      resultado = resultado.filter(prop =>
+        prop.propietarioNombre.toLowerCase().includes(filtroPropietario.toLowerCase())
+      );
+    }
+
+    // Filtro por asesor (solo para admin/revisor)
+    if (filtroAsesor.trim()) {
+      resultado = resultado.filter(prop =>
+        prop.asesor?.nombre.toLowerCase().includes(filtroAsesor.toLowerCase())
+      );
+    }
+
+    // Filtro por fecha de creación
+    if (filtroFecha) {
+      const fechaFiltro = new Date(filtroFecha);
+      resultado = resultado.filter(prop => {
+        const fechaProp = new Date(prop.createdAt);
+        return fechaProp.toDateString() === fechaFiltro.toDateString();
+      });
+    }
+
+    setPropiedadesFiltradas(resultado);
+  };
+
+  const limpiarFiltros = () => {
+    setFiltroNombre('');
+    setFiltroPropietario('');
+    setFiltroAsesor('');
+    setFiltroFecha('');
+  };
+
   const handlePrev = () => {
     if (page > 1) setPage((p) => p - 1);
   };
@@ -111,10 +168,11 @@ const PropiedadesList: React.FC = () => {
     }
   };
 
-  const formatMonto = (monto: number) => {
+  const formatMonto = (monto: number, moneda?: 'ARS' | 'USD') => {
+    const currency = moneda || 'ARS';
     return monto.toLocaleString('es-AR', {
       style: 'currency',
-      currency: 'ARS',
+      currency: currency,
       maximumFractionDigits: 0,
     });
   };
@@ -150,22 +208,110 @@ const PropiedadesList: React.FC = () => {
     <PageContainer
       title="Propiedades"
       actions={
-        <Button onClick={() => navigate('/propiedades/nueva')} variant="primary">
-          <span>+</span> Nueva propiedad
+        <Button onClick={() => navigate('/propiedades/nueva')} variant="primary" size="lg">
+          <span style={{ fontSize: '1.2rem', marginRight: '8px' }}>➕</span>
+          <span style={{ fontWeight: 'bold' }}>CREAR NUEVA PROPIEDAD</span>
         </Button>
       }
     >
-      {propiedades.length === 0 ? (
+      {/* Filtros */}
+      <div className={styles.filterContainer}>
+        <h3 className={styles.filterTitle}>Buscar Propiedades</h3>
+        <div className={styles.filterGrid}>
+          <div className={styles.filterField}>
+            <label className={styles.filterLabel}>
+              <span style={{ fontSize: '1.3rem' }}>🏠</span>
+              <span>Nombre de Propiedad</span>
+            </label>
+            <input
+              type="text"
+              className={styles.filterInput}
+              placeholder="Ej: Casa Francia, Departamento..."
+              value={filtroNombre}
+              onChange={(e) => setFiltroNombre(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.filterField}>
+            <label className={styles.filterLabel}>
+              <span style={{ fontSize: '1.3rem' }}>👤</span>
+              <span>Propietario</span>
+            </label>
+            <input
+              type="text"
+              className={styles.filterInput}
+              placeholder="Ej: Juan Pérez, María García..."
+              value={filtroPropietario}
+              onChange={(e) => setFiltroPropietario(e.target.value)}
+            />
+          </div>
+
+          {/* Filtro de asesor solo visible para ADMIN y REVISOR */}
+          {(user?.rol === 'ADMIN' || user?.rol === 'REVISOR') && (
+            <div className={styles.filterField}>
+              <label className={styles.filterLabel}>
+                <span style={{ fontSize: '1.3rem' }}>👔</span>
+                <span>Asesor</span>
+              </label>
+              <input
+                type="text"
+                className={styles.filterInput}
+                placeholder="Ej: Agostina, Matías..."
+                value={filtroAsesor}
+                onChange={(e) => setFiltroAsesor(e.target.value)}
+              />
+            </div>
+          )}
+
+          <div className={styles.filterField}>
+            <label className={styles.filterLabel}>
+              <span style={{ fontSize: '1.3rem' }}>📅</span>
+              <span>Fecha de Creación</span>
+            </label>
+            <input
+              type="date"
+              className={styles.filterInput}
+              value={filtroFecha}
+              onChange={(e) => setFiltroFecha(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {(filtroNombre || filtroPropietario || filtroAsesor || filtroFecha) && (
+          <div className={styles.filterActions}>
+            <Button onClick={limpiarFiltros} variant="secondary" size="md">
+              <span style={{ fontSize: '1.1rem', marginRight: '6px' }}>🗑️</span>
+              Limpiar Filtros
+            </Button>
+            <span className={styles.filterCount}>
+              <span style={{ fontSize: '1.1rem', marginRight: '6px' }}>📊</span>
+              {propiedadesFiltradas.length} {propiedadesFiltradas.length === 1 ? 'resultado' : 'resultados'}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {propiedadesFiltradas.length === 0 ? (
         <div className={styles.emptyState}>
-          <p className={styles.emptyText}>No hay propiedades para mostrar</p>
-          <Button onClick={() => navigate('/propiedades/nueva')} variant="primary">
-            ➕ Crear la primera propiedad
-          </Button>
+          <p className={styles.emptyText}>
+            {propiedades.length === 0 
+              ? 'No hay propiedades para mostrar'
+              : 'No se encontraron propiedades con los filtros aplicados'}
+          </p>
+          {propiedades.length === 0 ? (
+            <Button onClick={() => navigate('/propiedades/nueva')} variant="primary">
+              ➕ Crear la primera propiedad
+            </Button>
+          ) : (
+            <Button onClick={limpiarFiltros} variant="secondary">
+              Limpiar filtros
+            </Button>
+          )}
         </div>
       ) : (
         <>
           <div className={styles.grid}>
-            {propiedades.map((prop) => (
+            {propiedadesFiltradas.map((prop) => (
               <Card
                 key={prop.id}
                 hover
@@ -201,7 +347,7 @@ const PropiedadesList: React.FC = () => {
                     <div className={styles.mandatoChip}>
                       <span className={styles.mandatoIcon}>📄</span>
                       <span className={styles.mandatoText}>
-                        Mandato: {formatMonto(prop.mandato.monto)} • {prop.mandato.plazo}
+                        Mandato: {formatMonto(prop.mandato.monto, prop.mandato.moneda)} • {prop.mandato.plazo}
                       </span>
                     </div>
                   )}

@@ -7,6 +7,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Property } from '../types';
 import { colors, typography, spacing } from '../theme';
 import { StatusBadge } from './StatusBadge';
+import { FavoriteButton } from './FavoriteButton';
 
 interface PropertyCardProps {
   property: Property;
@@ -34,10 +35,13 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
       activeOpacity={0.7}
     >
       <View style={styles.header}>
-        <Text style={styles.title} numberOfLines={1}>
-          {property.titulo}
-        </Text>
-        <StatusBadge status={property.estado} size="small" />
+        <View style={styles.titleContainer}>
+          <Text style={styles.title} numberOfLines={1}>
+            {property.titulo}
+          </Text>
+          <StatusBadge status={property.estado} size="small" />
+        </View>
+        <FavoriteButton propertyId={property.id} size="medium" />
       </View>
 
       <View style={styles.content}>
@@ -93,15 +97,18 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: spacing.md,
+  },
+  titleContainer: {
+    flex: 1,
+    marginRight: spacing.sm,
   },
   title: {
     fontSize: typography.sizes.lg,
     fontWeight: typography.weights.semibold,
     color: colors.textPrimary,
-    flex: 1,
-    marginRight: spacing.sm,
+    marginBottom: spacing.xs,
   },
   content: {
     gap: spacing.sm,
@@ -132,3 +139,4 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 });
+

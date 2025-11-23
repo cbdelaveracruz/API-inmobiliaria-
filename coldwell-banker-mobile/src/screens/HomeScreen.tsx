@@ -4,34 +4,52 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppStackParamList } from '../navigation/types';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../contexts/AuthContext';
 import { PrimaryButton } from '../components';
+import { HomeStackParamList } from '../navigation/types';
 import { colors, typography, spacing } from '../theme';
 
-type Props = NativeStackScreenProps<AppStackParamList, 'Home'>;
+type HomeScreenNavigationProp = NativeStackNavigationProp<HomeStackParamList, 'Home'>;
 
-const HomeScreen = ({ navigation }: Props) => {
+const HomeScreen = () => {
   const { user } = useAuth();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
   return (
     <View style={styles.container}>
+      {/* Header con botones de navegación */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.headerButton}
+          onPress={() => navigation.navigate('Profile')}
+        >
+          <Text style={styles.headerIcon}>👤</Text>
+          <Text style={styles.headerText}>Perfil</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.headerButton}
+          onPress={() => navigation.navigate('Settings')}
+        >
+          <Text style={styles.headerIcon}>⚙️</Text>
+          <Text style={styles.headerText}>Ajustes</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.content}>
         {/* Ícono */}
         <Text style={styles.icon}>🏢</Text>
 
-        {/* Título de bienvenida */}
-        <Text style={styles.title}>
-          Bienvenido al Sistema Inmobiliario
+        {/* Saludo personalizado */}
+        <Text style={styles.greeting}>
+          ¡Hola, {user?.nombre}!
         </Text>
 
-        {/* Subtítulo personalizado */}
+        {/* Subtítulo */}
         <Text style={styles.subtitle}>
-          {user?.nombre} {user?.apellido || ''}
-        </Text>
-        <Text style={styles.role}>
           {user?.rol === 'ASESOR' ? 'Asesor Inmobiliario' : 'Administrador'}
         </Text>
 
@@ -42,8 +60,8 @@ const HomeScreen = ({ navigation }: Props) => {
 
         {/* Botón principal: PROPIEDADES */}
         <PrimaryButton
-          title="PROPIEDADES"
-          onPress={() => navigation.navigate('PropertiesList')}
+          title="VER PROPIEDADES"
+          onPress={() => (navigation.getParent() as any)?.navigate('PropertiesTab')}
           style={styles.button}
         />
       </View>
@@ -56,6 +74,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.backgroundCard,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  headerButton: {
+    alignItems: 'center',
+    padding: spacing.sm,
+  },
+  headerIcon: {
+    fontSize: 24,
+    marginBottom: spacing.xs,
+  },
+  headerText: {
+    fontSize: typography.sizes.xs,
+    color: colors.textSecondary,
+  },
   content: {
     flex: 1,
     justifyContent: 'center',
@@ -66,21 +105,14 @@ const styles = StyleSheet.create({
     fontSize: 80,
     marginBottom: spacing.lg,
   },
-  title: {
+  greeting: {
     fontSize: typography.sizes['2xl'],
     fontWeight: typography.weights.bold,
     color: colors.textPrimary,
     textAlign: 'center',
-    marginBottom: spacing.md,
-  },
-  subtitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.medium,
-    color: colors.textPrimary,
-    textAlign: 'center',
     marginBottom: spacing.xs,
   },
-  role: {
+  subtitle: {
     fontSize: typography.sizes.base,
     color: colors.primary,
     textAlign: 'center',

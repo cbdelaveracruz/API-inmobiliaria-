@@ -13,14 +13,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppStackParamList } from '../navigation/types';
+import { PropertiesStackParamList } from '../navigation/types';
 import { propertiesApi } from '../api';
 import { CreatePropertyDto, Property } from '../types';
 import { PrimaryButton, InputField } from '../components';
 import { colors, typography, spacing } from '../theme';
 import * as DocumentPicker from 'expo-document-picker';
 
-type Props = NativeStackScreenProps<AppStackParamList, 'PropertyForm'>;
+type Props = NativeStackScreenProps<PropertiesStackParamList, 'PropertyForm'>;
 
 const PropertyFormScreen = ({ route, navigation }: Props) => {
   const { propertyId } = route.params || {};

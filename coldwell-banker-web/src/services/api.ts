@@ -98,4 +98,40 @@ export const descargarMandatoWord = async (
   window.URL.revokeObjectURL(url);
 };
 
+/**
+ * Descarga un documento PDF de forma segura
+ * Usa el endpoint protegido que valida permisos
+ */
+export const descargarDocumento = async (documentoId: number): Promise<void> => {
+  try {
+    const response = await api.get(`/documentos/${documentoId}/download`, {
+      responseType: 'blob',
+    });
+
+    // Obtener el nombre del archivo del header Content-Disposition si existe
+    const contentDisposition = response.headers['content-disposition'];
+    let filename = `documento_${documentoId}.pdf`;
+
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+      if (filenameMatch && filenameMatch[1]) {
+        filename = filenameMatch[1];
+      }
+    }
+
+    // Crear URL del blob y descargar
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode?.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Error al descargar documento:', error);
+    throw error;
+  }
+};
+
 export default api;

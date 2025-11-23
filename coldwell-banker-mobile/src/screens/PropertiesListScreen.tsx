@@ -15,14 +15,14 @@ import {
   Alert,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppStackParamList } from '../navigation/types';
+import { PropertiesStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
 import { propertiesApi } from '../api';
 import { Property, UserRole } from '../types';
 import { PropertyCard } from '../components';
 import { colors, typography, spacing } from '../theme';
 
-type Props = NativeStackScreenProps<AppStackParamList, 'PropertiesList'>;
+type Props = NativeStackScreenProps<PropertiesStackParamList, 'PropertiesList'>;
 
 const PropertiesListScreen = ({ navigation }: Props) => {
   const { role } = useAuth();
@@ -90,7 +90,7 @@ const PropertiesListScreen = ({ navigation }: Props) => {
           : 'No hay propiedades en el sistema'}
       </Text>
       <Text style={styles.emptySubtext}>
-        Presiona el botón "+" para crear una nueva propiedad
+        Presiona el botón "NUEVA PROPIEDAD" para comenzar
       </Text>
     </View>
   );
@@ -130,13 +130,13 @@ const PropertiesListScreen = ({ navigation }: Props) => {
         }
       />
 
-      {/* Botón flotante para nueva propiedad */}
+      {/* Botón para nueva propiedad */}
       <TouchableOpacity
-        style={styles.fab}
+        style={styles.newPropertyButton}
         onPress={handleNewProperty}
         activeOpacity={0.8}
       >
-        <Text style={styles.fabIcon}>+</Text>
+        <Text style={styles.buttonText}>NUEVA PROPIEDAD</Text>
       </TouchableOpacity>
     </View>
   );
@@ -186,26 +186,24 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
   },
-  fab: {
-    position: 'absolute',
-    right: spacing.lg,
-    bottom: spacing.lg,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+  newPropertyButton: {
+    margin: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: colors.primary,
-    justifyContent: 'center',
+    borderRadius: 8,
     alignItems: 'center',
-    elevation: 8,
+    justifyContent: 'center',
+    elevation: 4,
     shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
-  fabIcon: {
-    fontSize: 32,
-    color: colors.white,
+  buttonText: {
+    fontSize: typography.sizes.base,
     fontWeight: typography.weights.bold,
+    color: colors.white,
+    letterSpacing: 0.5,
   },
 });
 

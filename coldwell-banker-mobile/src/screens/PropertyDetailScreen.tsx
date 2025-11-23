@@ -14,14 +14,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppStackParamList } from '../navigation/types';
+import { PropertiesStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
 import { propertiesApi, mandatesApi } from '../api';
 import { Property, PropertyStatus, UserRole, UpdatePropertyStatusDto } from '../types';
-import { PrimaryButton, StatusBadge, InputField } from '../components';
+import { PrimaryButton, StatusBadge, InputField, FavoriteButton } from '../components';
 import { colors, typography, spacing } from '../theme';
 
-type Props = NativeStackScreenProps<AppStackParamList, 'PropertyDetail'>;
+type Props = NativeStackScreenProps<PropertiesStackParamList, 'PropertyDetail'>;
 
 const PropertyDetailScreen = ({ route, navigation }: Props) => {
   const { propertyId } = route.params;
@@ -132,10 +132,13 @@ const PropertyDetailScreen = ({ route, navigation }: Props) => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Header con estado */}
+      {/* Header con estado y favorito */}
       <View style={styles.header}>
-        <Text style={styles.title}>{property.titulo}</Text>
-        <StatusBadge status={property.estado} size="large" />
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>{property.titulo}</Text>
+          <StatusBadge status={property.estado} size="large" />
+        </View>
+        <FavoriteButton propertyId={property.id} size="large" />
       </View>
 
       {/* Información básica */}
@@ -303,7 +306,14 @@ const styles = StyleSheet.create({
     color: colors.error,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: spacing.lg,
+  },
+  titleContainer: {
+    flex: 1,
+    marginRight: spacing.md,
   },
   title: {
     fontSize: typography.sizes['2xl'],

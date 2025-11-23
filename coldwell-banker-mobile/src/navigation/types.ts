@@ -13,17 +13,36 @@ export type AuthStackParamList = {
 };
 
 /**
- * Stack de la aplicación (con sesión iniciada)
+ * Bottom Tab Navigator
  */
-export type AppStackParamList = {
+export type MainTabsParamList = {
+  HomeTab: undefined;
+  PropertiesTab: undefined;
+  FavoritesTab: undefined;
+};
+
+/**
+ * Stack de Home (dentro del tab)
+ */
+export type HomeStackParamList = {
   Home: undefined;
+  Profile: undefined;
+  Settings: undefined;
+};
+
+/**
+ * Stack de Propiedades (dentro del tab)
+ */
+export type PropertiesStackParamList = {
   PropertiesList: undefined;
   PropertyDetail: { propertyId: string };
-  PropertyForm: { propertyId?: string }; // undefined = crear nueva
+  PropertyForm: { propertyId?: string };
   MandateForm: { propertyId: string };
 };
 
 /**
  * Navegación raíz
  */
-export type RootStackParamList = AuthStackParamList & AppStackParamList;
+export type RootStackParamList = AuthStackParamList & {
+  AppStack: undefined;
+};

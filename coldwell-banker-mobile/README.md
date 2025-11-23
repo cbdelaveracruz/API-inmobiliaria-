@@ -1,195 +1,304 @@
-# Coldwell Banker Mobile
+# 📱 Coldwell Banker Mobile - App Móvil
 
-App móvil del sistema inmobiliario Coldwell Banker, desarrollada con React Native + Expo + TypeScript.
+Aplicación móvil nativa para gestión inmobiliaria con React Native y Expo.
 
-## 📱 Características
+## � Tecnologías
 
-- **Autenticación**: Login con email y contraseña
-- **Roles**: ASESOR y ADMIN con permisos diferenciados
-- **Gestión de Propiedades**: Crear, editar, listar y ver detalles
-- **Estados de Propiedad**: Pendiente, Aprobado, Rechazado
-- **Mandatos**: Generación de mandatos para propiedades aprobadas
-- **Documentación**: Subida de archivos y documentos
+- **React Native**
+- **Expo SDK** 52
+- **TypeScript** v5.9
+- **React Navigation** v6
+- **Axios** para peticiones HTTP
+- **Expo Router** para navegación
 
-## 🏗️ Arquitectura
+## 📦 Funcionalidades
+
+### 🔐 Autenticación
+- Pantalla de login nativa
+- Almacenamiento seguro de tokens
+- Context API para autenticación
+- Navegación protegida
+
+### 🏠 Gestión de Propiedades
+
+#### Listado
+- Cards con información resumida
+- Scroll infinito
+- Pull to refresh
+- Filtros por estado
+- Indicadores visuales
+
+#### Detalle
+- Información completa
+- Imágenes de la propiedad
+- Estado y observaciones
+- Botones de acción según rol
+
+#### Crear/Editar
+- Formulario nativo optimizado
+- Validación de campos
+- Selección de imágenes
+- Feedback visual
+
+#### Cambio de Estado (ADMIN/REVISOR)
+- Modal nativo
+- Campo de observaciones
+- Confirmación
+
+### 📊 Dashboard
+- Estadísticas visuales
+- Resumen de propiedades
+- Accesos rápidos
+
+### � Perfil
+- Información del usuario
+- Configuración
+- Logout
+
+## 📁 Estructura del Proyecto
 
 ```
 src/
-├── api/                 # Cliente HTTP y servicios
-│   ├── client.ts       # Configuración de Axios
-│   ├── authApi.ts      # Servicio de autenticación
-│   ├── propertiesApi.ts # Servicio de propiedades
-│   └── mandatesApi.ts  # Servicio de mandatos
-├── components/          # Componentes reutilizables
-│   ├── PrimaryButton.tsx
-│   ├── StatusBadge.tsx
-│   ├── PropertyCard.tsx
-│   └── InputField.tsx
-├── contexts/           # Context API
-│   └── AuthContext.tsx # Manejo de sesión
-├── navigation/         # Navegación
-│   ├── AuthStack.tsx   # Stack sin sesión
-│   ├── AppStack.tsx    # Stack con sesión
-│   └── RootNavigator.tsx
-├── screens/            # Pantallas
-│   ├── LoginScreen.tsx
-│   ├── HomeScreen.tsx
-│   ├── PropertiesListScreen.tsx
-│   ├── PropertyDetailScreen.tsx
-│   ├── PropertyFormScreen.tsx
-│   └── MandateFormScreen.tsx
-├── theme/              # Tema visual
-│   ├── colors.ts
-│   ├── typography.ts
-│   └── spacing.ts
-└── types/              # Tipos TypeScript
-    └── index.ts
+├── api/
+│   ├── client.ts              # Cliente Axios configurado
+│   ├── authApi.ts             # Endpoints de autenticación
+│   ├── propertiesApi.ts       # Endpoints de propiedades
+│   └── mandatesApi.ts         # Endpoints de mandatos
+├── components/
+│   ├── PropertyCard.tsx       # Card de propiedad
+│   ├── FavoriteButton.tsx     # Botón de favoritos
+│   └── index.ts               # Exports
+├── context/
+│   └── AuthContext.tsx        # Estado global de autenticación
+├── navigation/
+│   ├── AppNavigator.tsx       # Navegador principal
+│   ├── TabNavigator.tsx       # Pestañas inferiores
+│   ├── HomeStack.tsx          # Stack de inicio
+│   ├── PropertiesStack.tsx    # Stack de propiedades
+│   └── types.ts               # Types de navegación
+├── screens/
+│   ├── LoginScreen.tsx        # Pantalla de login
+│   ├── HomeScreen.tsx         # Pantalla de inicio
+│   ├── PropertiesListScreen.tsx # Listado de propiedades
+│   ├── PropertyDetailScreen.tsx # Detalle de propiedad
+│   ├── PropertyFormScreen.tsx   # Crear/editar propiedad
+│   ├── MandateFormScreen.tsx    # Crear mandato
+│   ├── FavoritesScreen.tsx      # Favoritos
+│   ├── ProfileScreen.tsx        # Perfil
+│   ├── SettingsScreen.tsx       # Configuración
+│   └── index.ts                 # Exports
+├── types/
+│   └── index.ts               # TypeScript types compartidos
+└── App.tsx                    # Punto de entrada
 ```
 
-## ⚙️ Configuración inicial
-
-### 1. Instalar dependencias
+## 🛠️ Instalación
 
 ```bash
+# Instalar dependencias
 npm install
+
+# Iniciar Expo
+npx expo start
+
+# Ejecutar en Android
+npx expo start --android
+
+# Ejecutar en iOS
+npx expo start --ios
+
+# Ejecutar en web
+npx expo start --web
 ```
 
-### 2. Configurar URL del backend
+## 🌐 Configuración
 
-Editar el archivo `src/api/client.ts` y cambiar la URL base:
+### Variables de Entorno
 
-```typescript
-const API_BASE_URL = 'https://tu-backend.com/api'; // ⚠️ CAMBIAR AQUÍ
+Crear archivo `.env`:
+
+```env
+# URL del backend API
+EXPO_PUBLIC_API_URL=http://tu-ip:3000
 ```
 
-### 3. Ajustar endpoints
+**Nota**: En desarrollo, usar la IP local de tu máquina, no `localhost`.
 
-En los archivos de servicios (`authApi.ts`, `propertiesApi.ts`, `mandatesApi.ts`), ajustar las rutas según tu backend:
+### Configuración de API
 
-```typescript
-// Ejemplo en authApi.ts
-await apiClient.post('/auth/login', { email, password }); // Ajustar ruta
-```
+El cliente Axios está configurado en `src/api/client.ts` con:
+- Base URL desde variables de entorno
+- Interceptores para JWT
+- Manejo de errores
+- Timeout configurado
 
-### 4. Verificar tipos de datos
+## 📱 Navegación
 
-En `src/types/index.ts`, ajustar las interfaces según los modelos de tu backend:
+### Tab Navigator (Pestañas Inferiores)
+- 🏠 **Inicio**: Dashboard y accesos rápidos
+- 📋 **Propiedades**: Listado de propiedades
+- ⭐ **Favoritos**: Propiedades favoritas
+- � **Perfil**: Información y configuración
 
-```typescript
-export interface Property {
-  // Ajustar campos según tu modelo real
-}
-```
+### Stack Navigators
+- **HomeStack**: Navegación desde inicio
+- **PropertiesStack**: Navegación de propiedades
 
-## 🚀 Ejecutar la aplicación
+## 🎨 Diseño
 
-### Desarrollo
+- **Componentes nativos** optimizados
+- **Diseño adaptativo** para diferentes tamaños de pantalla
+- **Tema consistente** con colores de marca
+- **Animaciones nativas** suaves
+- **Gestos nativos** (swipe, pull-to-refresh)
+
+## � Roles y Funcionalidades
+
+### ADMIN
+- Ver todas las propiedades
+- Aprobar/rechazar propiedades
+- Acceso completo
+
+### REVISOR
+- Ver todas las propiedades
+- Aprobar/rechazar propiedades
+
+### ASESOR
+- Ver solo sus propiedades
+- Crear propiedades
+- Crear mandatos
+
+## 🔒 Seguridad
+
+- ✅ Almacenamiento seguro de tokens
+- ✅ Rutas protegidas
+- ✅ Validación de inputs
+- ✅ Manejo de errores
+- ✅ Timeout de sesión
+
+## 🚀 Build y Deployment
+
+### Android
 
 ```bash
+# Build APK
+eas build --platform android --profile preview
+
+# Build AAB para Play Store
+eas build --platform android --profile production
+```
+
+### iOS
+
+```bash
+# Build para TestFlight
+eas build --platform ios --profile preview
+
+# Build para App Store
+eas build --platform ios --profile production
+```
+
+## 📝 Scripts Disponibles
+
+```bash
+# Desarrollo
+npm start
+
 # Android
 npm run android
 
-# iOS (solo en macOS)
+# iOS
 npm run ios
 
 # Web
 npm run web
+
+# Lint
+npm run lint
+
+# Type check
+npm run type-check
 ```
 
-### Expo Go
+## 🧪 Testing
 
 ```bash
-npx expo start
+# Ejecutar tests (cuando estén implementados)
+npm test
+
+# Watch mode
+npm run test:watch
 ```
 
-Escanear el QR con la app Expo Go en tu teléfono.
+## 📦 Dependencias Principales
 
-## 👥 Roles y permisos
-
-### ASESOR
-- Ver sus propiedades
-- Crear nuevas propiedades (quedan en estado Pendiente)
-- Editar sus propiedades
-- Generar mandatos (solo si la propiedad está Aprobada)
-- Subir documentación
-
-### ADMIN
-- Ver todas las propiedades
-- Cambiar estado de propiedades (Pendiente → Aprobado/Rechazado)
-- Agregar observaciones
-- Todas las funciones de ASESOR
-
-## 📊 Flujo de trabajo
-
-1. **ASESOR** crea una propiedad → Estado: **Pendiente**
-2. **ADMIN** revisa la propiedad y cambia el estado:
-   - → **Aprobado**: El asesor puede generar mandato
-   - → **Rechazado**: El asesor debe corregir
-3. **ASESOR** genera mandato (solo si está Aprobado)
-4. Se puede descargar/ver el PDF del mandato
-
-## 🎨 Tema
-
-La app usa un tema oscuro coherente con la aplicación web:
-
-- **Fondo principal**: `#0F172A`
-- **Tarjetas**: `#1E293B`
-- **Primario**: `#1E40AF` (azul)
-- **Estados**:
-  - Pendiente: `#F59E0B` (amarillo/naranja)
-  - Aprobado: `#10B981` (verde)
-  - Rechazado: `#EF4444` (rojo)
-
-## 📝 Notas importantes
-
-- Los tokens se guardan en `AsyncStorage` de forma persistente
-- El interceptor de Axios agrega automáticamente el token a todas las peticiones
-- Si el token expira (401), se limpia automáticamente la sesión
-- Los documentos se suben usando `FormData` con `multipart/form-data`
-
-## 🔧 Personalización
-
-### Cambiar colores
-
-Editar `src/theme/colors.ts`:
-
-```typescript
-export const colors = {
-  primary: '#TU_COLOR',
-  // ...
-};
+```json
+{
+  "expo": "~52.0.0",
+  "react": "18.3.1",
+  "react-native": "0.76.5",
+  "@react-navigation/native": "^6.1.18",
+  "@react-navigation/bottom-tabs": "^6.6.1",
+  "@react-navigation/native-stack": "^6.11.0",
+  "axios": "^1.7.9",
+  "typescript": "^5.9.3"
+}
 ```
 
-### Agregar campos al formulario
+## � Notas de Desarrollo
 
-1. Actualizar interface en `src/types/index.ts`
-2. Agregar campo en `PropertyFormScreen.tsx`
-3. Enviar en el DTO correspondiente
+### Características Implementadas
+- ✅ Autenticación con JWT
+- ✅ Navegación con React Navigation
+- ✅ Gestión de estado con Context API
+- ✅ Cliente API con Axios
+- ✅ TypeScript en todo el proyecto
+- ✅ Componentes reutilizables
 
-## 📦 Dependencias principales
+### Próximas Mejoras
+- [ ] Tests con Jest y React Native Testing Library
+- [ ] Implementar React Query para cache
+- [ ] Agregar notificaciones push
+- [ ] Implementar modo offline
+- [ ] Agregar animaciones con Reanimated
+- [ ] Implementar deep linking
+- [ ] Agregar analytics
+- [ ] Implementar crash reporting
 
-- `react-native` - Framework mobile
-- `expo` - Herramientas de desarrollo
-- `@react-navigation/native` - Navegación
-- `axios` - Cliente HTTP
-- `@react-native-async-storage/async-storage` - Almacenamiento local
-- `expo-document-picker` - Selector de archivos
-- `@react-native-picker/picker` - Selector dropdown
+## 🎯 Características Destacadas
 
-## 🐛 Troubleshooting
+- ✅ **Expo**: Desarrollo rápido y fácil deployment
+- ✅ **TypeScript**: Tipado fuerte
+- ✅ **React Navigation**: Navegación nativa
+- ✅ **Context API**: Gestión de estado simple
+- ✅ **Axios Interceptors**: Manejo automático de tokens
+- ✅ **Componentes nativos**: Rendimiento óptimo
 
-### Error de conexión al backend
-- Verificar que la URL en `client.ts` sea correcta
-- Si usas emulador Android, usar `http://10.0.2.2:3000` en lugar de `localhost`
-- Si usas dispositivo físico, usar la IP local de tu computadora
+## 🔧 Troubleshooting
 
-### Token no se envía
-- Verificar que el interceptor de Axios esté configurado
-- Revisar que el token se guardó correctamente en AsyncStorage
+### Error de conexión con API
+- Verificar que la URL en `.env` use la IP local, no `localhost`
+- Verificar que el backend esté corriendo
+- Verificar que estén en la misma red
 
-### Errores de tipos TypeScript
-- Ajustar las interfaces en `src/types/index.ts` según tu backend
+### Error al instalar dependencias
+```bash
+# Limpiar cache
+npm cache clean --force
+rm -rf node_modules
+npm install
+```
+
+### Error al iniciar Expo
+```bash
+# Limpiar cache de Expo
+npx expo start -c
+```
+
+## 👨‍💻 Desarrollador
+
+Matías - Desarrollador Full Stack
 
 ## 📄 Licencia
 
-Coldwell Banker - Sistema Inmobiliario
+Proyecto privado - Coldwell Banker Argentina

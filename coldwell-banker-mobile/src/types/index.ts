@@ -111,5 +111,6 @@ export interface UpdatePropertyStatusDto {
 export interface CreateMandateDto {
   plazoDias: number;
   monto: number;
+  moneda?: string;
   observaciones?: string;
 }

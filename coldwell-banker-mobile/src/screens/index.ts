@@ -4,3 +4,6 @@ export { default as PropertiesListScreen } from './PropertiesListScreen';
 export { default as PropertyDetailScreen } from './PropertyDetailScreen';
 export { default as PropertyFormScreen } from './PropertyFormScreen';
 export { default as MandateFormScreen } from './MandateFormScreen';
+export { default as FavoritesScreen } from './FavoritesScreen';
+export { default as ProfileScreen } from './ProfileScreen';
+export { default as SettingsScreen } from './SettingsScreen';

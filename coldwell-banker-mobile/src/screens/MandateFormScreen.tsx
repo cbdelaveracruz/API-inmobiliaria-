@@ -17,13 +17,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AppStackParamList } from '../navigation/types';
+import { PropertiesStackParamList } from '../navigation/types';
 import { propertiesApi, mandatesApi } from '../api';
 import { Property, Mandate, CreateMandateDto, PropertyStatus } from '../types';
 import { PrimaryButton, InputField, StatusBadge } from '../components';
 import { colors, typography, spacing } from '../theme';
 
-type Props = NativeStackScreenProps<AppStackParamList, 'MandateForm'>;
+type Props = NativeStackScreenProps<PropertiesStackParamList, 'MandateForm'>;
 
 const MandateFormScreen = ({ route, navigation }: Props) => {
   const { propertyId } = route.params;
@@ -34,6 +34,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
   const [isSaving, setIsSaving] = useState(false);
 
   const [monto, setMonto] = useState('');
+  const [moneda, setMoneda] = useState<'ARS' | 'USD'>('ARS');
   const [plazoDias, setPlazoDias] = useState<30 | 60 | 90>(30);
   const [observaciones, setObservaciones] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -63,6 +64,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
       if (mandate) {
         setExistingMandate(mandate);
         setMonto(mandate.monto.toString());
+        setMoneda((mandate.moneda as 'ARS' | 'USD') || 'ARS');
         setPlazoDias(mandate.plazoDias as 30 | 60 | 90);
         setObservaciones(mandate.observaciones || '');
       }
@@ -96,6 +98,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
       const data: CreateMandateDto = {
         plazoDias: plazoDias,
         monto: Number(monto),
+        moneda: moneda,
         observaciones: observaciones.trim() || undefined,
       };
 
@@ -114,24 +117,24 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
         
         setExistingMandate(newMandate);
         
-        // Construir URL del PDF manualmente (el backend no la devuelve)
-        const pdfUrl = `http://192.168.1.5:3000/propiedades/${propertyId}/mandato/pdf`;
+        // Construir URL del documento Word manualmente (el backend no la devuelve)
+        const wordUrl = `http://192.168.1.5:3000/propiedades/${propertyId}/mandato/word`;
         
         Alert.alert(
           'Éxito',
-          'Mandato generado correctamente. ¿Desea descargar el PDF?',
+          'Mandato generado correctamente. ¿Desea descargar el documento?',
           [
             { text: 'Después', style: 'cancel' },
             { 
               text: 'Descargar', 
               onPress: async () => {
                 Alert.alert(
-                  'Descargando PDF',
-                  'El PDF del mandato se está abriendo en el navegador. Puede tardar unos segundos.',
+                  'Descargando documento',
+                  'El documento del mandato se está abriendo. Puede tardar unos segundos.',
                   [{ text: 'Entendido' }]
                 );
                 // Pequeño delay para que el usuario vea el mensaje
-                setTimeout(() => handleDownloadPdf(pdfUrl), 500);
+                setTimeout(() => handleDownloadWord(wordUrl), 500);
               }
             }
           ]
@@ -152,7 +155,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
 
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleDownloadPdf = async (pdfUrl?: string) => {
+  const handleDownloadWord = async (wordUrl?: string) => {
     setIsDownloading(true);
     try {
       // Obtener el token de AsyncStorage
@@ -163,47 +166,47 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
         return;
       }
       
-      let url = pdfUrl;
+      let url = wordUrl;
       
       // Si no se pasa URL, construirla manualmente con el propertyId
       if (!url) {
-        url = `http://192.168.1.5:3000/propiedades/${propertyId}/mandato/pdf`;
+        url = `http://192.168.1.5:3000/propiedades/${propertyId}/mandato/word`;
       }
       
       // Agregar el token como query parameter
       const urlWithToken = `${url}?token=${token}`;
       
-      console.log('📄 Descargando PDF:', urlWithToken);
+      console.log('📄 Descargando documento Word:', urlWithToken);
       
       // Nombre del archivo y ruta en cache
-      const fileName = `mandato-${propertyId}-${Date.now()}.pdf`;
+      const fileName = `mandato-${propertyId}-${Date.now()}.docx`;
       const fileUri = FileSystem.cacheDirectory + fileName;
       
       // Descargar el archivo usando la API legacy
       const downloadResult = await FileSystem.downloadAsync(urlWithToken, fileUri);
       
-      console.log('✅ PDF descargado correctamente en:', downloadResult.uri);
+      console.log('✅ Documento descargado correctamente en:', downloadResult.uri);
       
       // Verificar si se puede compartir
       const canShare = await Sharing.isAvailableAsync();
       
       if (canShare) {
-        // Compartir el PDF (esto abrirá opciones para ver o enviar)
+        // Compartir el documento Word (esto abrirá opciones para ver o enviar)
         await Sharing.shareAsync(downloadResult.uri, {
-          mimeType: 'application/pdf',
-          dialogTitle: 'Mandato PDF',
+          mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          dialogTitle: 'Mandato Word',
         });
       } else {
         Alert.alert(
           'Éxito',
-          `PDF descargado correctamente en: ${downloadResult.uri}`
+          `Documento descargado correctamente en: ${downloadResult.uri}`
         );
       }
     } catch (error: any) {
-      console.error('❌ Error al descargar PDF:', error);
+      console.error('❌ Error al descargar documento:', error);
       Alert.alert(
         'Error',
-        'No se pudo descargar el PDF del mandato. ' + (error.message || '')
+        'No se pudo descargar el documento del mandato. ' + (error.message || '')
       );
     } finally {
       setIsDownloading(false);
@@ -238,7 +241,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
         </Text>
 
         <InputField
-          label="Monto (ARS)"
+          label={`Monto (${moneda})`}
           value={monto}
           onChangeText={(text) => {
             setMonto(text);
@@ -249,6 +252,32 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
           error={errors.monto}
           required
         />
+
+        {/* Selector de moneda */}
+        <Text style={styles.label}>
+          Moneda <Text style={styles.required}>*</Text>
+        </Text>
+        <View style={styles.plazoDiasContainer}>
+          {(['ARS', 'USD'] as const).map((currency) => (
+            <TouchableOpacity
+              key={currency}
+              style={[
+                styles.plazoDiasButton,
+                moneda === currency && styles.plazoDiasButtonSelected,
+              ]}
+              onPress={() => setMoneda(currency)}
+            >
+              <Text
+                style={[
+                  styles.plazoDiasButtonText,
+                  moneda === currency && styles.plazoDiasButtonTextSelected,
+                ]}
+              >
+                {currency}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
         {/* Selector de plazo en días */}
         <Text style={styles.label}>
@@ -296,7 +325,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
         {existingMandate && existingMandate.urlPdf && (
           <PrimaryButton
             title="📄 Ver / Descargar Mandato"
-            onPress={() => handleDownloadPdf(existingMandate.urlPdf)}
+            onPress={() => handleDownloadWord(existingMandate.urlPdf)}
             variant="secondary"
             loading={isDownloading}
             style={styles.button}

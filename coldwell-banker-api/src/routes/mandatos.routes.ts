@@ -3,11 +3,25 @@ import {
   crearMandatoDesdeExpediente,
   obtenerMandatoPorExpediente,
   actualizarEstadoMandato,
-  descargarWordMandato
+  descargarPlantillaMandatoPersonaFisica
 } from '../controllers/mandatos.controller';
 import { autenticar, esAdmin } from '../middlewares/auth.middleware';
 
 const router = Router();
+
+/**
+ * GET /mandatos/plantilla/persona-fisica
+ * Descarga la plantilla estática de mandato de venta para persona física
+ * Requiere autenticación
+ */
+router.get('/mandatos/plantilla/persona-fisica', autenticar, descargarPlantillaMandatoPersonaFisica);
+
+/**
+ * Rutas de compatibilidad para el frontend existente
+ * Redirigen la petición de "generar word" a la descarga de la plantilla estática
+ */
+router.get('/expedientes/:id/mandato/word', autenticar, descargarPlantillaMandatoPersonaFisica);
+router.get('/propiedades/:id/mandato/word', autenticar, descargarPlantillaMandatoPersonaFisica);
 
 /**
  * POST /expedientes/:id/mandato
@@ -20,21 +34,10 @@ router.post('/expedientes/:id/mandato', autenticar, crearMandatoDesdeExpediente)
 router.post('/propiedades/:id/mandato', autenticar, crearMandatoDesdeExpediente);
 
 /**
- * GET /expedientes/:id/mandato/word
- * GET /propiedades/:id/mandato/word (alias para mobile)
- * Genera y descarga el documento Word del mandato dinámicamente
- * Requiere autenticación
- * ⚠️ IMPORTANTE: Esta ruta DEBE ir ANTES de GET /expedientes/:id/mandato
- */
-router.get('/expedientes/:id/mandato/word', autenticar, descargarWordMandato);
-router.get('/propiedades/:id/mandato/word', autenticar, descargarWordMandato);
-
-/**
  * GET /expedientes/:id/mandato
  * GET /propiedades/:id/mandato (alias para mobile)
  * Obtiene el mandato de un expediente
  * Requiere autenticación
- * ⚠️ IMPORTANTE: Esta ruta debe ir DESPUÉS de las rutas más específicas (/pdf)
  */
 router.get('/expedientes/:id/mandato', autenticar, obtenerMandatoPorExpediente);
 router.get('/propiedades/:id/mandato', autenticar, obtenerMandatoPorExpediente);

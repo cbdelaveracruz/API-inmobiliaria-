@@ -9,7 +9,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ⚠️ URL del backend (misma red WiFi)
-const API_BASE_URL = 'http://192.168.1.5:3000';
+const API_BASE_URL = 'http://192.168.1.9:3000';
 
 /**
  * Instancia de Axios configurada

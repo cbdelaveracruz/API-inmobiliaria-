@@ -131,14 +131,7 @@ const PropertyFormScreen = ({ route, navigation }: Props) => {
   const uploadDocuments = async (propertyId: string) => {
     try {
       for (const doc of selectedDocuments) {
-        const formData = new FormData();
-        formData.append('file', {
-          uri: doc.uri,
-          name: doc.name,
-          type: doc.mimeType || 'application/octet-stream',
-        } as any);
-
-        await propertiesApi.uploadDocument(propertyId, formData);
+        await propertiesApi.uploadDocument(propertyId, doc);
       }
     } catch (error) {
       console.error('Error uploading documents:', error);

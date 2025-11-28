@@ -102,13 +102,25 @@ export const propertiesApi = {
    * Subir documento a una propiedad
    * ⚠️ Ruta ejemplo: POST /propiedades/:id/documentos
    */
-  uploadDocument: async (propertyId: string, formData: FormData): Promise<any> => {
+  uploadDocument: async (propertyId: string, file: any): Promise<any> => {
+    const formData = new FormData();
+    
+    // ⚠️ IMPORTANTE: El ID debe ir ANTES del archivo para que Multer lo pueda leer
+    // en req.body al procesar el destino del archivo.
+    formData.append('expedienteId', propertyId);
+    
+    formData.append('archivo', {
+      uri: file.uri,
+      name: file.name,
+      type: file.mimeType || 'application/octet-stream',
+    } as any);
+
     const response = await apiClient.post(
-      `/propiedades/${propertyId}/documentos`,
+      '/documentos',
       formData,
       {
-        headers: {
-          'Content-Type': 'multipart/form-data',
+        transformRequest: (data, headers) => {
+          return formData; // React Native specific: prevent Axios from serializing FormData
         },
       }
     );

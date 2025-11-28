@@ -76,23 +76,43 @@ const storage = multer.diskStorage({
   }
 });
 
-// Filtro para validar que solo se suban archivos PDF
+// Filtro para validar que solo se suban archivos PDF o Imágenes
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  console.log('🔍 [Multer] Filtering file:', file.originalname, 'Mime:', file.mimetype);
+
+  const allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg', 'application/octet-stream'];
+  
   // Validar por mimetype
-  if (file.mimetype === 'application/pdf') {
-    cb(null, true);
-    return;
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    // Si es octet-stream, verificamos doblemente la extensión
+    if (file.mimetype === 'application/octet-stream') {
+        const ext = path.extname(file.originalname).toLowerCase();
+        const validExts = ['.pdf', '.jpg', '.jpeg', '.png'];
+        if (validExts.includes(ext)) {
+            console.log('✅ [Multer] Accepted octet-stream with valid extension:', ext);
+            cb(null, true);
+            return;
+        }
+    } else {
+        console.log('✅ [Multer] Accepted by mimetype:', file.mimetype);
+        cb(null, true);
+        return;
+    }
   }
 
   // Validar por extensión (fallback)
   const extension = path.extname(file.originalname).toLowerCase();
-  if (extension === '.pdf') {
+  const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png'];
+  
+  if (allowedExtensions.includes(extension)) {
+    console.log('✅ [Multer] Accepted by extension:', extension);
     cb(null, true);
     return;
   }
 
+  console.error('❌ [Multer] Rejected file:', file.originalname, file.mimetype);
   // Rechazar el archivo
-  cb(new Error('Solo se permiten archivos PDF'));
+  cb(new Error('Solo se permiten archivos PDF o Imágenes (JPG, PNG)'));
 };
 
 // Configuración de multer

@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     try {
       console.log('🔐 Intentando login con:', email);
-      console.log('📍 URL del backend:', 'http://192.168.1.5:3000');
+      console.log('📍 URL del backend:', 'http://192.168.1.9:3000');
       
       const response = await authApi.login(email, password);
       
@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error.response) {
         throw new Error(error.response?.data?.message || `Error ${error.response.status}: ${error.response.statusText}`);
       } else if (error.request) {
-        throw new Error('No se pudo conectar al servidor. Verifica que el backend esté corriendo en http://192.168.1.5:3000');
+        throw new Error('No se pudo conectar al servidor. Verifica que el backend esté corriendo en http://192.168.1.9:3000');
       } else {
         throw new Error(error.message || 'Error al iniciar sesión');
       }

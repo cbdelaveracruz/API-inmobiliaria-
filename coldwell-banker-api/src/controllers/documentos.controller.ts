@@ -96,14 +96,21 @@ export const crearDocumento = async (req: Request, res: Response) => {
     // Detectar si viene un archivo (modo multipart) o JSON (modo tradicional)
     const esArchivoSubido = req.file !== undefined;
 
+    console.log('📂 [POST /documentos] Request received');
+    console.log('📄 req.file:', req.file ? `${req.file.originalname} (${req.file.mimetype})` : 'undefined');
+    console.log('📦 req.body:', JSON.stringify(req.body, null, 2));
+
     // ========== VALIDACIONES COMUNES ==========
 
     // Soportar tanto 'expedienteId' (legacy) como 'propiedadId' (nuevo)
     const { expedienteId: expedienteIdLegacy, propiedadId, tipo, nombre } = req.body;
     const expedienteId = propiedadId || expedienteIdLegacy;
 
+    console.log('🔍 expedienteId resolved:', expedienteId);
+
     // Validación: expedienteId (o propiedadId) es obligatorio (en ambos modos)
     if (!expedienteId) {
+      console.error('❌ Error: expedienteId missing');
       res.status(400).json({
         error: 'El campo "propiedadId" o "expedienteId" es obligatorio'
       });
@@ -130,6 +137,8 @@ export const crearDocumento = async (req: Request, res: Response) => {
       });
       return;
     }
+
+    // ========== MODO 1: ARCHIVO SUBIDO (multipart/form-data) ==========
 
     // ========== MODO 1: ARCHIVO SUBIDO (multipart/form-data) ==========
 
@@ -173,17 +182,35 @@ export const crearDocumento = async (req: Request, res: Response) => {
         }
       });
 
+      // Construir URL completa para el frontend
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const fileUrl = `${baseUrl}/${rutaArchivo}`;
+
       res.status(201).json({
         mensaje: 'Documento subido y creado exitosamente',
-        documento: nuevoDocumento,
+        documento: {
+            ...nuevoDocumento,
+            url: fileUrl
+        },
         archivoInfo: {
           nombreOriginal: archivo.originalname,
           tamaño: archivo.size,
           mimetype: archivo.mimetype,
-          rutaLocal: rutaArchivo
+          rutaLocal: rutaArchivo,
+          url: fileUrl
         }
       });
       return;
+    } else {
+        // Si el content-type era multipart pero no hay file, Multer lo rechazó
+        const contentType = req.headers['content-type'] || '';
+        if (contentType.includes('multipart/form-data')) {
+            console.error('❌ Error: Multipart request but no file found (Multer rejection?)');
+            res.status(400).json({
+                error: 'El archivo fue rechazado. Asegúrese de que sea un PDF o Imagen (JPG, PNG) válido.'
+            });
+            return;
+        }
     }
 
     // ========== MODO 2: JSON (compatibilidad con código existente) ==========

@@ -118,7 +118,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
         setExistingMandate(newMandate);
         
         // Construir URL del documento Word manualmente (el backend no la devuelve)
-        const wordUrl = `http://192.168.1.5:3000/propiedades/${propertyId}/mandato/word`;
+        const wordUrl = `http://192.168.1.9:3000/propiedades/${propertyId}/mandato/word`;
         
         Alert.alert(
           'Éxito',
@@ -170,7 +170,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
       
       // Si no se pasa URL, construirla manualmente con el propertyId
       if (!url) {
-        url = `http://192.168.1.5:3000/propiedades/${propertyId}/mandato/word`;
+        url = `http://192.168.1.9:3000/propiedades/${propertyId}/mandato/word`;
       }
       
       // Agregar el token como query parameter

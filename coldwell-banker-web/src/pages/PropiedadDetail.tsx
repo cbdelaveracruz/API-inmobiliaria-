@@ -235,7 +235,7 @@ const PropiedadDetail = () => {
           </div>
           
           <p className={styles.ownerInfo}>
-            Propietario: <strong>{propiedad.propietarioNombre}</strong>
+            Propietario/s: <strong>{propiedad.propietarioNombre}</strong>
           </p>
 
           {/* Mensaje informativo según el estado */}

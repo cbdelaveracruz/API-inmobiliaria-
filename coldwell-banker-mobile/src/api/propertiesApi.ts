@@ -61,9 +61,12 @@ export const propertiesApi = {
   createProperty: async (data: CreatePropertyDto): Promise<Property> => {
     console.log('🏗️ Creando nueva propiedad:', data);
     try {
-      const response = await apiClient.post<Property>('/propiedades', data);
+      const response = await apiClient.post<any>('/propiedades', data);
       console.log('✅ Propiedad creada:', response.data);
-      return response.data;
+      
+      // El backend devuelve { mensaje: "...", expediente: {...} }
+      // Necesitamos extraer el expediente (propiedad)
+      return response.data.expediente || response.data;
     } catch (error: any) {
       console.error('❌ Error al crear propiedad:', error);
       console.error('❌ Error response:', error.response?.data);
@@ -100,31 +103,46 @@ export const propertiesApi = {
 
   /**
    * Subir documento a una propiedad
-   * ⚠️ Ruta ejemplo: POST /propiedades/:id/documentos
+   * ⚠️ Ruta ejemplo: POST /documentos
    */
   uploadDocument: async (propertyId: string, file: any): Promise<any> => {
+    console.log('📤 Uploading document for property:', propertyId);
+    console.log('📄 File info:', { uri: file.uri, name: file.name, type: file.mimeType });
+    
     const formData = new FormData();
     
     // ⚠️ IMPORTANTE: El ID debe ir ANTES del archivo para que Multer lo pueda leer
     // en req.body al procesar el destino del archivo.
     formData.append('expedienteId', propertyId);
     
+    // React Native's FormData expects object with uri, name, and type
     formData.append('archivo', {
       uri: file.uri,
       name: file.name,
-      type: file.mimeType || 'application/octet-stream',
+      type: file.mimeType || 'application/pdf',
     } as any);
 
-    const response = await apiClient.post(
-      '/documentos',
-      formData,
-      {
-        transformRequest: (data, headers) => {
-          return formData; // React Native specific: prevent Axios from serializing FormData
-        },
-      }
-    );
-    return response.data;
+    console.log('📦 FormData prepared, sending request to /documentos...');
+
+    try {
+      const response = await apiClient.post(
+        '/documentos',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          // Let Axios handle the FormData transformation automatically for React Native
+        }
+      );
+      console.log('✅ Document uploaded successfully:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Upload error:', error);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error response:', error.response?.data);
+      throw error;
+    }
   },
 
   /**

@@ -51,7 +51,12 @@ export interface Property {
   propietarioNombre: string;
   emails?: string;
   asesorId: string;
-  asesorNombre?: string; // Para mostrar en UI
+  asesor?: {
+    id: string;
+    nombre: string;
+    email: string;
+    rol: string;
+  };
   estado: PropertyStatus;
   observaciones?: string;
   documentos?: PropertyDocument[];

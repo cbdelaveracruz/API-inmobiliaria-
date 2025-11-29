@@ -35,7 +35,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
 
   const [monto, setMonto] = useState('');
   const [moneda, setMoneda] = useState<'ARS' | 'USD'>('ARS');
-  const [plazoDias, setPlazoDias] = useState<30 | 60 | 90>(30);
+  const [plazoDias, setPlazoDias] = useState('30'); // Cambiado a string para input
   const [observaciones, setObservaciones] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -65,7 +65,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
         setExistingMandate(mandate);
         setMonto(mandate.monto.toString());
         setMoneda((mandate.moneda as 'ARS' | 'USD') || 'ARS');
-        setPlazoDias(mandate.plazoDias as 30 | 60 | 90);
+        setPlazoDias(mandate.plazoDias.toString()); // Convertir a string
         setObservaciones(mandate.observaciones || '');
       }
     } catch (error: any) {
@@ -84,6 +84,12 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
       newErrors.monto = 'El monto debe ser un número válido mayor a 0';
     }
 
+    if (!plazoDias.trim()) {
+      newErrors.plazoDias = 'El plazo es requerido';
+    } else if (isNaN(Number(plazoDias)) || Number(plazoDias) <= 0) {
+      newErrors.plazoDias = 'El plazo debe ser un número válido mayor a 0';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -96,7 +102,7 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
     setIsSaving(true);
     try {
       const data: CreateMandateDto = {
-        plazoDias: plazoDias,
+        plazoDias: Number(plazoDias),
         monto: Number(monto),
         moneda: moneda,
         observaciones: observaciones.trim() || undefined,
@@ -279,31 +285,19 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
           ))}
         </View>
 
-        {/* Selector de plazo en días */}
-        <Text style={styles.label}>
-          Plazo (días) <Text style={styles.required}>*</Text>
-        </Text>
-        <View style={styles.plazoDiasContainer}>
-          {[30, 60, 90].map((dias) => (
-            <TouchableOpacity
-              key={dias}
-              style={[
-                styles.plazoDiasButton,
-                plazoDias === dias && styles.plazoDiasButtonSelected,
-              ]}
-              onPress={() => setPlazoDias(dias as 30 | 60 | 90)}
-            >
-              <Text
-                style={[
-                  styles.plazoDiasButtonText,
-                  plazoDias === dias && styles.plazoDiasButtonTextSelected,
-                ]}
-              >
-                {dias} días
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {/* Campo de plazo en días (input libre) */}
+        <InputField
+          label="Plazo (días)"
+          value={plazoDias}
+          onChangeText={(text) => {
+            setPlazoDias(text);
+            setErrors({ ...errors, plazoDias: '' });
+          }}
+          placeholder="Ej: 30, 45, 90, etc."
+          keyboardType="numeric"
+          error={errors.plazoDias}
+          required
+        />
 
         <InputField
           label="Observaciones"

@@ -327,7 +327,7 @@ const PropiedadesList: React.FC = () => {
 
                 <div className={styles.cardBody}>
                   <div className={styles.cardRow}>
-                    <span className={styles.cardLabel}>Propietario:</span>
+                    <span className={styles.cardLabel}>Propietario/s:</span>
                     <span className={styles.cardValue}>{prop.propietarioNombre}</span>
                   </div>
 

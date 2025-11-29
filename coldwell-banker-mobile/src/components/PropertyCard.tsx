@@ -62,7 +62,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         <View style={styles.row}>
           <Text style={styles.label}>Asesor:</Text>
           <Text style={styles.value} numberOfLines={1}>
-            {property.asesorNombre || 'N/A'}
+            {property.asesor?.nombre || 'N/A'}
           </Text>
         </View>
 

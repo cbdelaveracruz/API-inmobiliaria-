@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   Alert,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PropertiesStackParamList } from '../navigation/types';
@@ -114,6 +115,33 @@ const PropertyDetailScreen = ({ route, navigation }: Props) => {
     });
   };
 
+  const handleOpenDocument = async (doc: any) => {
+    try {
+      // Construir URL completa del documento
+      const baseUrl = 'http://192.168.1.9:3000'; // Debe coincidir con tu API
+      const documentUrl = doc.rutaArchivo ? `${baseUrl}/${doc.rutaArchivo}` : doc.url;
+      
+      console.log('📄 Abriendo documento:', documentUrl);
+      
+      const canOpen = await Linking.canOpenURL(documentUrl);
+      
+      if (canOpen) {
+        await Linking.openURL(documentUrl);
+      } else {
+        Alert.alert(
+          'Error',
+          'No se puede abrir este documento. Asegúrate de tener una aplicación para ver PDFs instalada.'
+        );
+      }
+    } catch (error) {
+      console.error('Error al abrir documento:', error);
+      Alert.alert(
+        'Error',
+        'No se pudo abrir el documento. Verifica tu conexión.'
+      );
+    }
+  };
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -171,7 +199,7 @@ const PropertyDetailScreen = ({ route, navigation }: Props) => {
 
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Asesor:</Text>
-          <Text style={styles.infoValue}>{property.asesorNombre || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{property.asesor?.nombre || 'N/A'}</Text>
         </View>
 
         <View style={styles.infoRow}>
@@ -187,6 +215,39 @@ const PropertyDetailScreen = ({ route, navigation }: Props) => {
           <Text style={styles.observationsText}>{property.observaciones}</Text>
         </View>
       )}
+
+      {/* Documentos */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Documentación</Text>
+        
+        {property.documentos && property.documentos.length > 0 ? (
+          <View>
+            {property.documentos.map((doc: any, index: number) => (
+              <TouchableOpacity 
+                key={doc.id || index} 
+                style={styles.documentItem}
+                onPress={() => handleOpenDocument(doc)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.documentIcon}>
+                  <Text style={styles.documentIconText}>📄</Text>
+                </View>
+                <View style={styles.documentInfo}>
+                  <Text style={styles.documentName} numberOfLines={1}>
+                    {doc.nombre || `Documento ${index + 1}`}
+                  </Text>
+                  <Text style={styles.documentType}>
+                    {doc.tipo || 'PDF'}
+                  </Text>
+                </View>
+                <Text style={styles.chevron}>›</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : (
+          <Text style={styles.emptyText}>No hay documentos adjuntos</Text>
+        )}
+      </View>
 
       {/* Sección ADMIN: Cambiar estado */}
       {role === UserRole.ADMIN && (
@@ -411,6 +472,53 @@ const styles = StyleSheet.create({
   warningSubtext: {
     fontSize: typography.sizes.sm,
     color: colors.textSecondary,
+  },
+  documentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.backgroundInput,
+    borderRadius: 8,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  documentIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: colors.primary + '20',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
+  documentIconText: {
+    fontSize: typography.sizes.xl,
+  },
+  documentInfo: {
+    flex: 1,
+  },
+  documentName: {
+    fontSize: typography.sizes.base,
+    fontWeight: typography.weights.medium,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs / 2,
+  },
+  documentType: {
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
+  },
+  emptyText: {
+    fontSize: typography.sizes.base,
+    color: colors.textSecondary,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingVertical: spacing.md,
+  },
+  chevron: {
+    fontSize: typography.sizes['2xl'],
+    color: colors.textSecondary,
+    marginLeft: spacing.sm,
   },
 });
 

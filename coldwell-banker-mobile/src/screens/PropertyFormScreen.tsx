@@ -176,6 +176,9 @@ const PropertyFormScreen = ({ route, navigation }: Props) => {
         Alert.alert('Éxito', 'Propiedad creada correctamente. Estado: Pendiente');
       }
 
+      console.log('✅ Propiedad guardada:', savedProperty);
+      console.log('🆔 ID de la propiedad:', savedProperty.id);
+
       // Subir documentos si hay
       if (selectedDocuments.length > 0) {
         await uploadDocuments(savedProperty.id);
@@ -194,11 +197,21 @@ const PropertyFormScreen = ({ route, navigation }: Props) => {
 
   const uploadDocuments = async (propertyId: string) => {
     try {
+      console.log(`📤 Uploading ${selectedDocuments.length} document(s) for property ${propertyId}`);
+      
       for (const doc of selectedDocuments) {
+        console.log('📄 Uploading:', doc.name);
         await propertiesApi.uploadDocument(propertyId, doc);
       }
-    } catch (error) {
-      console.error('Error uploading documents:', error);
+      
+      console.log('✅ All documents uploaded successfully');
+    } catch (error: any) {
+      console.error('❌ Error uploading documents:', error);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error details:', JSON.stringify(error, null, 2));
+      
+      // Re-throw to show error to user
+      throw new Error('Error al subir documentos: ' + (error.message || 'Error desconocido'));
     }
   };
 

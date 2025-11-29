@@ -73,7 +73,7 @@ export const descargarMandatoWord = async (
   expedienteId: number,
   tituloExpediente: string
 ): Promise<void> => {
-  const response = await api.get(`/propiedades/${expedienteId}/mandato/word-completo`, {
+  const response = await api.get(`/expedientes/${expedienteId}/mandato/word-completo`, {
     responseType: 'blob',
   });
 

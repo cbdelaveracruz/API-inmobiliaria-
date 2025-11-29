@@ -123,8 +123,8 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
         
         setExistingMandate(newMandate);
         
-        // Construir URL del documento Word manualmente (el backend no la devuelve)
-        const wordUrl = `http://192.168.1.9:3000/propiedades/${propertyId}/mandato/word`;
+        // URL del documento Word autocompletado
+        const wordUrl = `/expedientes/${propertyId}/mandato/word-completo`;
         
         Alert.alert(
           'Éxito',
@@ -172,15 +172,18 @@ const MandateFormScreen = ({ route, navigation }: Props) => {
         return;
       }
       
-      let url = wordUrl;
-      
-      // Si no se pasa URL, construirla manualmente con el propertyId
-      if (!url) {
-        url = `http://192.168.1.9:3000/propiedades/${propertyId}/mandato/word`;
+      // Construir endpoint relativo si no se pasa URL
+      let endpoint = wordUrl;
+      if (!endpoint) {
+        endpoint = `/expedientes/${propertyId}/mandato/word-completo`;
       }
       
+      // Construir URL completa con la base del API
+      const API_BASE_URL = 'http://192.168.1.9:3000';
+      const fullUrl = `${API_BASE_URL}${endpoint}`;
+      
       // Agregar el token como query parameter
-      const urlWithToken = `${url}?token=${token}`;
+      const urlWithToken = `${fullUrl}?token=${token}`;
       
       console.log('📄 Descargando documento Word:', urlWithToken);
       

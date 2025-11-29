@@ -115,8 +115,6 @@ export const generarMandatoCompleto = async (req: Request, res: Response) => {
     const propietario2 = propietariosList[1] || null;
     const propietario3 = propietariosList[2] || null;
 
-
-
     const data = {
       // Datos de la propiedad
       tipoPropiedad: expediente.tipoPropiedad || '',

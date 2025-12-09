@@ -12,6 +12,10 @@ import mandatosRoutes from './routes/mandatos.routes';
 
 const app: Application = express();
 
+// SEGURIDAD: Configurar trust proxy para Railway
+// Railway usa reverse proxy, necesitamos confiar en el header X-Forwarded-For
+app.set('trust proxy', 1);
+
 // SEGURIDAD: Headers HTTP con Helmet.js
 app.use(helmet({
   contentSecurityPolicy: false, // Desactivado para permitir carga de assets

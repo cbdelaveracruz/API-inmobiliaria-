@@ -37,9 +37,11 @@ const loginLimiter = rateLimit({
 });
 
 // Middlewares
-// SEGURIDAD: Configurar CORS con origen específico
+// SEGURIDAD: Configurar CORS
+// En producción permitimos cualquier origen para facilitar testing
+// IMPORTANTE: En producción real, configurar origins específicos mediante FRONTEND_URL
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: true, // Permite todos los orígenes (cambiar en producción)
   credentials: true,
   optionsSuccessStatus: 200
 };

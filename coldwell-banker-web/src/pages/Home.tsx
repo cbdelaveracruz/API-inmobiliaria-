@@ -1,5 +1,5 @@
 // src/pages/Home.tsx
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import PageContainer from '../layout/PageContainer';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,11 @@ import styles from './Home.module.css';
 const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Si es ADMIN, redirigir directo a propiedades
+  if (user?.rol === 'ADMIN') {
+    return <Navigate to="/propiedades" replace />;
+  }
 
   return (
     <PageContainer title="">

@@ -27,8 +27,8 @@ api.interceptors.response.use(
       if (clearAuthCallback) {
         clearAuthCallback();
       }
-      // Redirigir a login
-      window.location.href = '/login';
+      // NO redirigir aquí - ProtectedRoute ya maneja eso
+      // window.location.href = '/login'; ← ESTO CAUSABA EL LOOP INFINITO
     }
     return Promise.reject(error);
   }

@@ -272,6 +272,18 @@ export const generarMandatoCompleto = async (req: Request, res: Response) => {
       propietario3EstadoCivil: propietario3?.estadoCivil || '',
       propietario3Email: propietario3?.email || '',
       
+      // Array de propietarios para bucles en la plantilla ({#propietarios}...{/propietarios})
+      propietarios: propietariosList.map(p => ({
+        nombre: p.nombreCompleto || p.nombre || '',
+        dni: p.dni || '',
+        fechaNacimiento: p.fechaNacimiento || '',
+        domicilio: p.domicilioReal || '',
+        celular: p.celular || '',
+        cuil: p.cuil || '',
+        estadoCivil: p.estadoCivil || '',
+        email: p.email || ''
+      })),
+
       // Fechas formateadas
       fechaActual: formatDate(new Date()),
     };

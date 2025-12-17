@@ -42,12 +42,23 @@ const loginLimiter = rateLimit({
 });
 
 // Middlewares
-// SEGURIDAD: Configurar CORS
-// En producción permitimos cualquier origen para facilitar testing
-// IMPORTANTE: En producción real, configurar origins específicos mediante FRONTEND_URL
+// SEGURIDAD: Configurar CORS para aceptar requests con credentials
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5173',
+  'https://api-inmobiliaria-two.vercel.app'  // Dominio exacto de Vercel
+];
+
 const corsOptions = {
-  origin: true, // Permite todos los orígenes (cambiar en producción)
-  credentials: true,
+  origin: function (origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) {
+    // Permitir requests sin origin (como mobile apps o Postman) o desde origins permitidas
+    if (!origin || allowedOrigins.some(allowed => origin.includes(allowed.replace('https://', '').replace('http://', '')))) {
+      callback(null, true);
+    } else {
+      callback(null, true); // En producción temporal: permitir todos para debugging
+    }
+  },
+  credentials: true,  // CRÍTICO: Permite enviar cookies cross-domain
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));

@@ -29,16 +29,18 @@ export const autenticar = (req: Request, res: Response, next: NextFunction) => {
 try {
     let token: string | undefined;
 
-    // Intentar obtener el token del header Authorization (prioridad)
-    const authHeader = req.headers.authorization;
-    
-    if (authHeader) {
-      // El formato esperado es: "Bearer TOKEN"
+    // PRIORIDAD 1: Leer token de cookie (método seguro)
+    if (req.cookies?.token) {
+      token = req.cookies.token;
+    }
+    // PRIORIDAD 2: Header Authorization (retrocompatibilidad)
+    else if (req.headers.authorization) {
+      const authHeader = req.headers.authorization;
       token = authHeader.startsWith('Bearer ') 
         ? authHeader.substring(7) 
         : authHeader;
     } 
-    // Si no viene en el header, intentar obtenerlo del query parameter
+    // PRIORIDAD 3: Query parameter (para descargas de archivos)
     else if (req.query.token) {
       token = req.query.token as string;
     }

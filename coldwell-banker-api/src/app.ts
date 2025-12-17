@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from 'path';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import usuariosRoutes from './routes/usuarios.routes';
 import authRoutes from './routes/auth.routes';
 import expedientesRoutes from './routes/expedientes.routes';
@@ -50,6 +51,7 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
+app.use(cookieParser()); // Parsear cookies en todas las requests
 app.use(express.json());
 
 // Servir archivos estáticos de la carpeta uploads

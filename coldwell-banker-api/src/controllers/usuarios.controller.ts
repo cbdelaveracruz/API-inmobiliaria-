@@ -62,3 +62,80 @@ try {
     });
 }
 };
+
+/**
+ * GET /usuarios
+ * Obtiene la lista de todos los usuarios (solo ADMIN)
+ */
+export const obtenerUsuarios = async (req: Request, res: Response) => {
+  try {
+    const usuarios = await prisma.usuario.findMany({
+      select: {
+        id: true,
+        nombre: true,
+        email: true,
+        rol: true,
+        createdAt: true
+        // NO devolvemos el hash
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    res.json({
+      usuarios
+    });
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({ 
+      error: 'Error interno del servidor' 
+    });
+  }
+};
+
+/**
+ * DELETE /usuarios/:id
+ * Elimina un usuario por ID (solo ADMIN)
+ */
+export const eliminarUsuario = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = parseInt(id);
+
+    if (isNaN(userId)) {
+      res.status(400).json({ 
+        error: 'ID de usuario inválido' 
+      });
+      return;
+    }
+
+    // Verificar que el usuario existe
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: userId }
+    });
+
+    if (!usuario) {
+      res.status(404).json({ 
+        error: 'Usuario no encontrado' 
+      });
+      return;
+    }
+
+    // Eliminar el usuario
+    await prisma.usuario.delete({
+      where: { id: userId }
+    });
+
+    res.json({
+      mensaje: 'Usuario eliminado exitosamente'
+    });
+  } catch (error) {
+    console.error('Error al eliminar usuario:', error);
+    res.status(500).json({ 
+      error: 'Error interno del servidor' 
+    });
+  }
+};
+
+

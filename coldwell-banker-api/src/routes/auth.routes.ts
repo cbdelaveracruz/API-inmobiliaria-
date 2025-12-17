@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { login } from '../controllers/auth.controller';
+import { login, logout, me } from '../controllers/auth.controller';
 import { crearUsuario } from '../controllers/usuarios.controller';
+import { autenticar } from '../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -10,6 +11,18 @@ const router = Router();
  * Body: { email, password }
  */
 router.post('/login', login);
+
+/**
+ * POST /auth/logout
+ * Cerrar sesión (limpiar cookie)
+ */
+router.post('/logout', logout);
+
+/**
+ * GET /auth/me
+ * Obtener datos del usuario actual (requiere autenticación)
+ */
+router.get('/me', autenticar, me);
 
 /**
  * POST /auth/register

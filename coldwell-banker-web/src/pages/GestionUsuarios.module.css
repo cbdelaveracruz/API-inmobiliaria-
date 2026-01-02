@@ -408,18 +408,40 @@
     font-size: 1rem;
   }
 
+  /* Formulario - fondo blanco */
   .formCard {
     padding: 1.5rem;
+    background: white; /* ✅ Fondo blanco */
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   }
 
   .formCard h2 {
     font-size: 1.25rem;
+    color: #0f172a;
+  }
+
+  .formGroup label {
+    color: #475569;
   }
 
   .formGroup input,
   .formGroup select {
-    font-size: 16px; /* Previene zoom automático en iOS */
-    min-height: 44px; /* Touch target mínimo */
+    font-size: 16px;
+    min-height: 44px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    color: #0f172a;
+  }
+
+  .formGroup input::placeholder {
+    color: #94a3b8;
+  }
+
+  .formGroup input:focus,
+  .formGroup select:focus {
+    background: white;
+    border-color: #7C3AED;
   }
 
   .formActions {
@@ -449,20 +471,20 @@
     gap: 1rem;
   }
 
+  /* Cards de usuarios - fondo blanco */
   .table tbody tr {
     display: flex;
     flex-direction: column;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: white; /* ✅ Fondo blanco */
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 1.25rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     margin-bottom: 0;
   }
 
   .table tbody tr:hover {
-    background-color: rgba(15, 23, 42, 0.7);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
   }
 
   .table tbody td {
@@ -470,7 +492,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid #e2e8f0;
+    color: #0f172a;
   }
 
   .table tbody td:last-child {
@@ -483,7 +506,7 @@
   .table tbody td:nth-child(1)::before {
     content: 'Nombre:';
     font-weight: 600;
-    color: #8a9fb8;
+    color: #64748b;
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -492,7 +515,7 @@
   .table tbody td:nth-child(2)::before {
     content: 'Email:';
     font-weight: 600;
-    color: #8a9fb8;
+    color: #64748b;
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -501,7 +524,7 @@
   .table tbody td:nth-child(3)::before {
     content: 'Rol:';
     font-weight: 600;
-    color: #8a9fb8;
+    color: #64748b;
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -510,7 +533,7 @@
   .table tbody td:nth-child(4)::before {
     content: 'Fecha creación:';
     font-weight: 600;
-    color: #8a9fb8;
+    color: #64748b;
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -533,14 +556,25 @@
     margin-left: auto;
   }
 
-  /* Modal responsive */
+  /* Modal responsive - fondo blanco */
   .modal {
     width: 95%;
     padding: 1.5rem;
+    background: white; /* ✅ Fondo blanco */
+    border: 1px solid #e2e8f0;
   }
 
   .modalHeader h2 {
     font-size: 1.25rem;
+    color: #0f172a;
+  }
+
+  .modalText {
+    color: #475569;
+  }
+
+  .modalText strong {
+    color: #0f172a;
   }
 
   .modalActions {

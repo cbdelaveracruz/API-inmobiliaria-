@@ -329,6 +329,62 @@
 }
 
 /* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .wrapper {
+    max-width: 100%;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  /* Grid a 1 columna en mobile */
+  .fieldsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  /* Secciones más compactas */
+  .section {
+    padding: 1.25rem;
+  }
+
+  .sectionEmoji {
+    font-size: 2rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.1rem;
+  }
+
+  .sectionDescription {
+    font-size: 0.85rem;
+  }
+
+  /* Botones más grandes en mobile */
+  .customFileButton {
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+  }
+}
+
 @media (max-width: 640px) {
   .card {
     padding: 2rem 1.5rem;

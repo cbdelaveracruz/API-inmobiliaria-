@@ -237,21 +237,28 @@ const PropiedadDetail = () => {
             Propietario/s: <strong>{propiedad.propietarioNombre}</strong>
           </p>
 
-          {/* Admin Actions - Aprobar/Rechazar */}
-          {canChangeStatus && (
+          {/* Admin Actions - Aprobar/Rechazar (condicional según estado) */}
+          {canChangeStatus && propiedad.estado !== 'APROBADO' && (
             <div className={styles.adminActions}>
-              <button 
-                onClick={() => setShowModal(true)} 
-                className={styles.approveButton}
-              >
-                ✅ Aprobar Propiedad
-              </button>
-              <button 
-                onClick={() => setShowModal(true)} 
-                className={styles.rejectButton}
-              >
-                ❌ Rechazar Propiedad
-              </button>
+              {/* Mostrar botón Aprobar si está PENDIENTE o RECHAZADO */}
+              {(propiedad.estado === 'PENDIENTE' || propiedad.estado === 'RECHAZADO') && (
+                <button 
+                  onClick={() => setShowModal(true)} 
+                  className={styles.approveButton}
+                >
+                  ✅ Aprobar Propiedad
+                </button>
+              )}
+              
+              {/* Mostrar botón Rechazar SOLO si está PENDIENTE */}
+              {propiedad.estado === 'PENDIENTE' && (
+                <button 
+                  onClick={() => setShowModal(true)} 
+                  className={styles.rejectButton}
+                >
+                  ❌ Rechazar Propiedad
+                </button>
+              )}
             </div>
           )}
 

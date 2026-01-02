@@ -74,52 +74,53 @@
 
 .label {
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
   color: white;
-  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.3px;
 }
 
-.fileInput {
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  color: white;
-  font-size: 0.95rem;
-  transition: all 0.3s;
-  cursor: pointer;
+.required {
+  color: #ff6b6b;
+  font-size: 1.3rem;
+  font-weight: 700;
 }
 
-.fileInput:hover {
-  border-color: #00AEEF;
-  background: rgba(255, 255, 255, 0.1);
+/* Hide native file input */
+.hiddenFileInput {
+  display: none;
 }
 
-.fileInput:focus {
-  outline: none;
-  border-color: #00AEEF;
-  box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.2);
-}
-
-.fileInput:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.fileInput::file-selector-button {
+/* Custom file button */
+.customFileButton {
   background: linear-gradient(135deg, #00AEEF, #0088cc);
   color: white;
   font-weight: 600;
-  padding: 0.5rem 1.25rem;
-  border-radius: 6px;
+  padding: 0.9rem 1.5rem;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
-  margin-right: 1rem;
   transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  text-align: center;
 }
 
-.fileInput::file-selector-button:hover {
+.customFileButton:hover {
   background: linear-gradient(135deg, #0088cc, #006aa8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 174, 239, 0.4);
+}
+
+.uploadIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
 }
 
 /* ========== SECTIONS ========== */

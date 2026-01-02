@@ -564,315 +564,37 @@
 }
 
 
-/* ========== MOBILE RESPONSIVE ========== */
 @media (max-width: 768px) {
-  .container {
-    padding: 1rem 0.5rem;
-  }
-
   .card {
-    padding: 1.5rem;
-    border-radius: 12px;
-  }
-
-  .backButton {
-    width: 100%;
-    justify-content: center;
-    min-height: 44px;
-    font-size: 1rem;
+    padding: 2rem 1.5rem;
   }
 
   .titleSection {
     flex-direction: column;
-    gap: 0.75rem;
   }
 
   .titleSection h1 {
-    font-size: 1.4rem;
-    line-height: 1.3;
+    font-size: 1.5rem;
   }
 
-  .headerRight {
-    align-self: flex-start;
-  }
-
-  .statusBadge {
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
-  }
-
-  /* Admin Actions */
-  .adminActions {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .approveButton,
-  .rejectButton {
-    width: 100%;
-    min-height: 48px;
-    padding: 0.9rem 1.5rem;
-  }
-
-  /* Info Grid */
   .infoGrid {
     grid-template-columns: 1fr;
-    gap: 1rem;
   }
 
-  .infoItem {
-    padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .infoItem:last-child {
-    border-bottom: none;
-  }
-
-  .infoLabel {
-    font-size: 0.75rem;
-  }
-
-  .infoValue {
-    font-size: 1rem;
-    margin-top: 0.25rem;
-  }
-
-  /* Owner Table → Card Layout */
-  .ownerTable {
-    display: block;
-  }
-
-  .ownerTable thead {
-    display: none;
-  }
-
-  .ownerTable tbody {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .ownerTable tbody tr {
-    display: flex;
-    flex-direction: column;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 0;
-  }
-
-  .ownerTable tbody tr:hover {
-    background: rgba(255, 255, 255, 0.05);
-  }
-
-  .ownerTable td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .ownerTable td:last-child {
-    border-bottom: none;
-  }
-
-  /* Add mobile labels */
-  .ownerTable td:nth-child(1)::before {
-    content: 'Nombre:';
-    font-weight: 600;
-    color: #8a9fb8;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  .ownerTable td:nth-child(2)::before {
-    content: 'DNI:';
-    font-weight: 600;
-    color: #8a9fb8;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  .ownerTable td:nth-child(3)::before {
-    content: 'Celular:';
-    font-weight: 600;
-    color: #8a9fb8;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  .ownerTable td:nth-child(4)::before {
-    content: 'Email:';
-    font-weight: 600;
-    color: #8a9fb8;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  /* Meta Info */
-  .metaInfo {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  /* Mandate */
   .mandateGrid {
     grid-template-columns: 1fr;
-    gap: 1rem;
   }
 
-  .mandateBox {
-    padding: 1.5rem;
-  }
-
-  .downloadButton {
-    min-height: 48px;
-    padding: 1rem 1.5rem;
-  }
-
-  .mandateLocked,
-  .mandateApproved,
-  .noDocumentsBox {
-    padding: 2rem 1.5rem;
-  }
-
-  .lockIcon,
-  .emptyIcon {
-    font-size: 2.5rem;
-  }
-
-  .generateButton {
-    width: 100%;
-    min-height: 48px;
-    padding: 1rem 1.5rem;
-  }
-
-  /* Documents */
   .documentsCallout {
     flex-direction: column;
     text-align: center;
-    padding: 1rem;
-    gap: 0.75rem;
-  }
-
-  .calloutText {
-    font-size: 0.9rem;
   }
 
   .uploadButton {
     width: 100%;
-    min-height: 44px;
-    padding: 0.85rem 1.25rem;
   }
 
-  /* Documents Table → Card Layout */
   .documentsTable {
-    overflow-x: visible;
-  }
-
-  .documentsTable table {
-    display: block;
-  }
-
-  .documentsTable thead {
-    display: none;
-  }
-
-  .documentsTable tbody {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .documentsTable tbody tr {
-    display: flex;
-    flex-direction: column;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 1rem;
-  }
-
-  .documentsTable tbody tr:hover {
-    background: rgba(255, 255, 255, 0.05);
-  }
-
-  .documentsTable td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .documentsTable td:last-child {
-    border-bottom: none;
-    padding-top: 1rem;
-  }
-
-  /* Add mobile labels for documents table */
-  .documentsTable td:nth-child(1)::before {
-    content: 'Tipo:';
-    font-weight: 600;
-    color: #8a9fb8;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  .documentsTable td:nth-child(2)::before {
-    content: 'Fecha:';
-    font-weight: 600;
-    color: #8a9fb8;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  .documentsTable td:nth-child(3) {
-    justify-content: center;
-  }
-
-  .viewDocButton {
-    display: inline-block;
-    background: linear-gradient(135deg, #00AEEF, #0088cc);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    min-width: 200px;
-    text-align: center;
-    transition: all 0.3s;
-  }
-
-  .viewDocButton:hover {
-    background: linear-gradient(135deg, #0088cc, #006aa8);
-    transform: translateY(-2px);
-    text-decoration: none;
+    overflow-x: auto;
   }
 }
-
-@media (max-width: 480px) {
-  .card {
-    padding: 1.25rem;
-  }
-
-  .titleSection h1 {
-    font-size: 1.25rem;
-  }
-
-  .sectionTitle {
-    font-size: 1.1rem;
-  }
-
-  .sectionIcon {
-    font-size: 1.3rem;
-  }
-}
-

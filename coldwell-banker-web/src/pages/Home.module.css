@@ -215,116 +215,46 @@
 @media (max-width: 768px) {
   .navbar {
     padding: 0 1rem;
-    height: 60px; /* Más altura para mejor touch */
   }
 
   .navLogo {
     height: 28px;
   }
 
-  .navRight {
-    gap: 0.75rem;
+  .userNameText {
+    display: none;
   }
 
-  .userDetails {
-    display: none; /* Ocultar en móvil */
-  }
-
-  .avatar {
-    width: 40px;
-    height: 40px;
-  }
-
-  .logoutBtn {
-    min-width: 44px;
-    min-height: 44px;
-    padding: 0.6rem;
-  }
-
-  .logoutIcon {
-    width: 22px;
-    height: 22px;
-  }
-
-  .main {
-    padding: 2rem 1rem;
-    padding-top: 80px;
+  .userRole {
+    display: none;
   }
 
   .mainLogo {
-    width: clamp(220px, 60vw, 320px);
+    width: clamp(200px, 50vw, 300px);
   }
 
   .title {
     font-size: 1.1rem;
     padding: 0 1rem;
-    white-space: normal; /* Permitir wrapping en móvil */
   }
 
   .propiedadesBtn {
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
-    min-height: 50px;
-    width: 90%;
-    max-width: 320px;
-  }
-
-  .propiedadesBtn svg {
-    width: 24px;
-    height: 24px;
+    padding: 0.9rem 2.5rem;
+    font-size: 1rem;
   }
 
   .footer {
     bottom: 1.5rem;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .footerBy {
-    font-size: 0.85rem;
-  }
-
-  .footerLogo {
-    height: 28px;
   }
 }
 
 @media (max-width: 480px) {
-  .navbar {
-    padding: 0 0.75rem;
-  }
-
-  .navLogo {
-    height: 24px;
-  }
-
-  .avatar {
-    width: 36px;
-    height: 36px;
-    font-size: 0.9rem;
-  }
-
-  .main {
-    padding: 1.5rem 0.75rem;
-    padding-top: 80px;
-  }
-
   .mainLogo {
-    width: clamp(180px, 70vw, 250px);
+    width: 180px;
   }
 
   .propiedadesBtn {
-    padding: 0.9rem 1.5rem;
-    font-size: 1rem;
-    width: 95%;
-  }
-
-  .footer {
-    bottom: 1rem;
-  }
-
-  .footerLogo {
-    height: 24px;
+    padding: 0.8rem 2rem;
+    font-size: 0.95rem;
   }
 }
-

@@ -298,128 +298,29 @@
     gap: 1rem;
   }
 
-  .pageTitle {
-    font-size: 1.6rem;
-  }
-
   .newPropBtn {
     width: 100%;
     justify-content: center;
-    padding: 1rem 1.5rem;
-    font-size: 1rem;
-    min-height: 50px;
-  }
-
-  .plusIcon {
-    font-size: 1.3rem;
   }
 
   .searchPanel {
     padding: 1.5rem;
   }
 
-  .searchHeader {
-    margin-bottom: 1.25rem;
-  }
-
-  .searchTitle {
-    font-size: 1.25rem;
-  }
-
   .searchGrid {
     grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-
-  .searchInput {
-    font-size: 16px; /* Previene zoom en iOS */
-    min-height: 44px; /* Touch target apropiado */
-    padding: 0.85rem 1rem;
   }
 
   .grid {
     grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-
-  .card {
-    padding: 1.25rem;
-  }
-
-  .cardTitle {
-    font-size: 1.1rem;
-  }
-
-  .badge {
-    padding: 0.35rem 0.7rem;
-    font-size: 0.7rem;
-  }
-
-  .cardLabel {
-    font-size: 0.8rem;
-  }
-
-  .cardValue {
-    font-size: 0.9rem;
   }
 
   .pagination {
     flex-direction: column;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
+    gap: 1rem;
   }
 
   .paginationBtn {
     width: 100%;
-    min-height: 48px;
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
-  }
-
-  .pageInfo {
-    order: -1; /* Mostrar primero */
-    font-size: 0.95rem;
-    padding: 0.5rem 0;
-  }
-
-  .emptyText,
-  .loadingText,
-  .errorText {
-    font-size: 1rem;
-    padding: 0 1rem;
-  }
-
-  .retryBtn {
-    min-height: 48px;
-    padding: 0.85rem 1.5rem;
-    font-size: 1rem;
   }
 }
-
-@media (max-width: 480px) {
-  .pageContainer {
-    padding: 0.75rem;
-  }
-
-  .pageTitle {
-    font-size: 1.4rem;
-  }
-
-  .searchPanel {
-    padding: 1.25rem;
-    border-radius: 12px;
-  }
-
-  .searchTitle {
-    font-size: 1.1rem;
-  }
-
-  .card {
-    padding: 1rem;
-  }
-
-  .cardTitle {
-    font-size: 1rem;
-  }
-}
-

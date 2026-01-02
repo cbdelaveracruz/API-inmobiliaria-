@@ -122,6 +122,57 @@
   background: linear-gradient(135deg, #0088cc, #006aa8);
 }
 
+/* ========== SECTIONS ========== */
+.section {
+  padding: 2rem;
+  background: rgba(0, 174, 239, 0.08);
+  border-radius: 12px;
+  border: 2px solid rgba(0, 174, 239, 0.25);
+  transition: all 0.3s;
+}
+
+.section:hover {
+  border-color: rgba(0, 174, 239, 0.4);
+  background: rgba(0, 174, 239, 0.12);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(0, 174, 239, 0.2);
+}
+
+.sectionEmoji {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(0, 174, 239, 0.5));
+}
+
+.sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #00AEEF;
+  margin: 0 0 0.25rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sectionDescription {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  font-style: italic;
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
 /* ========== FILE INFO ========== */
 .fileInfo {
   background: rgba(0, 174, 239, 0.1);

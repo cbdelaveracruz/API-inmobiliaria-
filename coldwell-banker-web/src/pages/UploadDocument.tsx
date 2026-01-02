@@ -172,22 +172,33 @@ const UploadDocument: React.FC = () => {
           <form onSubmit={handleSubmit} className={styles.form}>
             {/* Documentos Obligatorios */}
             <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>📋 Documentos Obligatorios</h3>
+              <div className={styles.sectionHeader}>
+                <span className={styles.sectionEmoji}>📋</span>
+                <div>
+                  <h3 className={styles.sectionTitle}>Documentos Obligatorios</h3>
+                  <p className={styles.sectionDescription}>Complete todos los campos requeridos</p>
+                </div>
+              </div>
               <div className={styles.fieldsGrid}>
-                {renderFileInput('titulo', 'Título de Propiedad', true)}
-                {renderFileInput('dni', 'DNI de los Titulares', true)}
-                {renderFileInput('api', 'API', true)}
-                {renderFileInput('tgi', 'TGI', true)}
+                {renderFileInput('titulo', '📄 Título de Propiedad', true)}
+                {renderFileInput('dni', '🆔 DNI de los Titulares', true)}
+                {renderFileInput('api', '📑 API', true)}
+                {renderFileInput('tgi', '🏢 TGI', true)}
               </div>
             </div>
 
             {/* Documentos Opcionales */}
             <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>📎 Documentos Opcionales</h3>
-              <p className={styles.hint}>
-                Plano de Obra, Plano de Mensura, Estado Parcelario, etc.
-              </p>
-              {renderFileInput('opcional', 'Otros Documentos', false)}
+              <div className={styles.sectionHeader}>
+                <span className={styles.sectionEmoji}>📎</span>
+                <div>
+                  <h3 className={styles.sectionTitle}>Documentos Opcionales</h3>
+                  <p className={styles.sectionDescription}>
+                    Plano de Obra, Plano de Mensura, Estado Parcelario, etc.
+                  </p>
+                </div>
+              </div>
+              {renderFileInput('opcional', '📂 Otros Documentos', false)}
             </div>
 
             {error && (

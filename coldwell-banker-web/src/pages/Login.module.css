@@ -193,7 +193,7 @@
 }
 
 .footerLogo img {
-  height: 60px; /* Logo más grande */
+  height: 90px; /* Logo mucho más grande */
   filter: brightness(1.1);
 }
 
@@ -400,6 +400,13 @@
     position: static;
     margin-top: 2rem;
     justify-content: center;
+    width: 100%;
+    left: 0;
+    transform: none;
+  }
+
+  .footerLogo img {
+    height: 70px; /* Logo grande también en tablet */
   }
 
   .card {

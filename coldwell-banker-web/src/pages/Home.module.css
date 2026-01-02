@@ -196,7 +196,7 @@
 }
 
 .footerLogo {
-  height: 50px; /* Logo más grande */
+  height: 80px; /* Logo mucho más grande */
   filter: brightness(1.1);
 }
 
@@ -271,10 +271,12 @@
 
   .footer {
     bottom: 1.5rem;
+    width: 100%;
+    left: 50%;
   }
 
   .footerLogo {
-    height: 45px;
+    height: 60px;
   }
 }
 
@@ -313,7 +315,7 @@
   }
 
   .footerLogo {
-    height: 40px;
+    height: 55px;
   }
 }
 

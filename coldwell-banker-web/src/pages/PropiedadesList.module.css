@@ -290,6 +290,7 @@
 @media (max-width: 768px) {
   .pageContainer {
     padding: 1rem;
+    background: white; /* ✅ FONDO BLANCO */
   }
 
   .pageHeader {
@@ -314,12 +315,9 @@
     font-size: 1.3rem;
   }
 
-  /* Panel de búsqueda - fondo blanco */
+  /* Panel de búsqueda - MANTENER AZUL como desktop */
   .searchPanel {
     padding: 1.5rem;
-    background: white; /* ✅ Fondo blanco */
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
 
   .searchHeader {
@@ -328,15 +326,6 @@
 
   .searchTitle {
     font-size: 1.25rem;
-    color: #0f172a; /* Texto oscuro sobre blanco */
-  }
-
-  .searchIcon {
-    color: #00AEEF;
-  }
-
-  .searchLabel {
-    color: #475569; /* Labels oscuros */
   }
 
   .searchGrid {
@@ -348,42 +337,20 @@
     font-size: 16px; /* Previene zoom en iOS */
     min-height: 44px;
     padding: 0.85rem 1rem;
-    background: #f8fafc; /* Fondo gris muy claro */
-    border: 2px solid #e2e8f0;
-    color: #0f172a;
   }
 
-  .searchInput::placeholder {
-    color: #94a3b8;
-  }
-
-  .searchInput:focus {
-    background: white;
-    border-color: #00AEEF;
-    box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.1);
-  }
-
+  /* Cards de propiedades - MANTENER AZUL como desktop */
   .grid {
     grid-template-columns: 1fr;
     gap: 1.25rem;
   }
 
-  /* Cards de propiedades - fondo blanco */
   .card {
     padding: 1.25rem;
-    background: white; /* ✅ Fondo blanco */
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-
-  .card:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
   }
 
   .cardTitle {
     font-size: 1.1rem;
-    color: #0f172a; /* Texto oscuro */
   }
 
   .badge {
@@ -393,13 +360,10 @@
 
   .cardLabel {
     font-size: 0.8rem;
-    color: #64748b; /* Gris medio */
   }
 
   .cardValue {
     font-size: 0.9rem;
-    color: #0f172a; /* Texto oscuro */
-    font-weight: 600;
   }
 
   .pagination {

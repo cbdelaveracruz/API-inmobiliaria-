@@ -9,6 +9,7 @@ import styles from './PropiedadDetail.module.css';
 interface Documento {
   id: number;
   tipo: string;
+  nombre?: string | null; // Nombre del archivo subido
   rutaArchivo: string;
   createdAt: string;
 }
@@ -432,7 +433,7 @@ const PropiedadDetail = () => {
                   <table>
                     <thead>
                       <tr>
-                        <th>Tipo</th>
+                        <th>Nombre del Archivo</th>
                         <th>Fecha de Carga</th>
                         <th>Acciones</th>
                       </tr>
@@ -440,7 +441,7 @@ const PropiedadDetail = () => {
                     <tbody>
                       {propiedad.documentos.map((doc) => (
                         <tr key={doc.id}>
-                          <td>{doc.tipo}</td>
+                          <td>{doc.nombre || doc.tipo}</td>
                           <td>
                             {new Date(doc.createdAt).toLocaleDateString('es-AR', {
                               day: '2-digit',

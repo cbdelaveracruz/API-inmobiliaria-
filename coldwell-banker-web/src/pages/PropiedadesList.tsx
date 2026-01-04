@@ -221,10 +221,12 @@ const PropiedadesList: React.FC = () => {
               <span>Fecha de creación</span>
             </div>
             <input
-              type="date"
+              type="text"
               className={styles.searchInput}
+              placeholder="dd/mm/aaaa"
               value={filtroFecha}
-              onChange={(e) => setFiltroFecha(e.target.value)}
+              onChange={handleDateChange}
+              maxLength={10}
             />
           </div>
         </div>

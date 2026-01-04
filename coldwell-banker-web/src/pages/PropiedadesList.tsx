@@ -101,6 +101,26 @@ const PropiedadesList: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [propiedades, filtroNombre, filtroPropietario, filtroFecha]);
 
+  // Función para formatear fecha automáticamente (dd/mm/yyyy)
+  const formatDateInput = (value: string) => {
+    // Remover todo excepto números
+    const numbers = value.replace(/\D/g, '');
+    
+    // Aplicar formato dd/mm/yyyy
+    if (numbers.length <= 2) {
+      return numbers;
+    } else if (numbers.length <= 4) {
+      return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+    } else {
+      return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+    }
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatDateInput(e.target.value);
+    setFiltroFecha(formatted);
+  };
+
   const aplicarFiltros = () => {
     let resultado = [...propiedades];
 

@@ -4,10 +4,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// Base de datos PostgreSQL para producción en Railway
-// Railway provee PostgreSQL automáticamente
+// Base de datos SQLite para desarrollo local
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 

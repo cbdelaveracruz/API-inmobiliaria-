@@ -4,7 +4,6 @@ import { Home as HomeIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import styles from './Home.module.css';
 import orbeLogo from '../assets/images/orbe_sin_fondo_blanco.png';
-import coldwellLogo from '../assets/images/logo_cb.png';
 import logoutIcon from '../assets/icons/cerrar-sesion.png';
 
 const Home = () => {
@@ -95,11 +94,6 @@ const Home = () => {
           )}
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <img src={coldwellLogo} alt="Coldwell Banker" className={styles.footerLogo} />
-      </footer>
     </div>
   );
 };

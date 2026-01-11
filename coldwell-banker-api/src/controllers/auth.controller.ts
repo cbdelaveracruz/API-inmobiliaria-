@@ -63,11 +63,12 @@ try {
     const isProduction = process.env.NODE_ENV === 'production';
     
     // Establecer cookie con el token (HttpOnly para seguridad)
+    // Session cookie: NO tiene maxAge, expira cuando se cierra el navegador
     res.cookie('token', token, {
       httpOnly: true,  // No accesible desde JavaScript (protección XSS)
       secure: isProduction,  // true en producción (Railway HTTPS), false en local
       sameSite: isProduction ? 'strict' : 'lax',  // 'strict' para same-site en orbe.ar
-      maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 días
+      // NO incluir maxAge para que sea session cookie (expira al cerrar navegador)
       domain: isProduction ? '.orbe.ar' : undefined,  // Dominio compartido para subdominios
       path: '/'  // Cookie disponible en toda la app
     });

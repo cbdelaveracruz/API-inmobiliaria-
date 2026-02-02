@@ -120,9 +120,9 @@ export const uploadPDF = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024 // Límite de 10MB por archivo
-    // TODO: Ajustar este límite según las necesidades
-    // Para archivos muy grandes (>10MB) considerar streaming o chunks
+    fileSize: 50 * 1024 * 1024 // Límite de 50MB por archivo
+    // Suficiente para documentos escaneados de alta calidad
+    // Para archivos muy grandes (>50MB) considerar streaming o chunks
   }
 });
 

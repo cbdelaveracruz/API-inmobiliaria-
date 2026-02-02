@@ -40,10 +40,10 @@ const UploadDocument: React.FC = () => {
       return;
     }
 
-    // Validar tamaño (máximo 10MB)
-    const maxSize = 10 * 1024 * 1024;
+    // Validar tamaño (máximo 50MB)
+    const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
-      setError(`El archivo para ${tipo.toUpperCase()} no puede superar los 10MB`);
+      setError(`El archivo para ${tipo.toUpperCase()} no puede superar los 50MB`);
       return;
     }
 
@@ -54,9 +54,10 @@ const UploadDocument: React.FC = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // Validar campos obligatorios
-    if (!files.titulo || !files.dni || !files.api || !files.tgi) {
-      setError('Todos los campos obligatorios deben tener un archivo (Título, DNI, API, TGI)');
+    // Validar que haya al menos un archivo seleccionado
+    const hasAtLeastOneFile = files.titulo || files.dni || files.api || files.tgi || files.opcional;
+    if (!hasAtLeastOneFile) {
+      setError('Debés cargar al menos un documento');
       return;
     }
 
@@ -70,18 +71,14 @@ const UploadDocument: React.FC = () => {
     setUploading(true);
 
     try {
-      // Subir cada archivo con su tipo correspondiente
-      const uploads = [
-        { file: files.titulo, tipo: 'ESCRITURA' },
-        { file: files.dni, tipo: 'DNI' },
-        { file: files.api, tipo: 'API' },
-        { file: files.tgi, tipo: 'TGI' },
-      ];
-
-      // Agregar archivo opcional si existe
-      if (files.opcional) {
-        uploads.push({ file: files.opcional, tipo: 'OTRO' });
-      }
+      // Subir solo los archivos seleccionados
+      const uploads = [];
+      
+      if (files.titulo) uploads.push({ file: files.titulo, tipo: 'ESCRITURA' });
+      if (files.dni) uploads.push({ file: files.dni, tipo: 'DNI' });
+      if (files.api) uploads.push({ file: files.api, tipo: 'API' });
+      if (files.tgi) uploads.push({ file: files.tgi, tipo: 'TGI' });
+      if (files.opcional) uploads.push({ file: files.opcional, tipo: 'OTRO' });
 
       // Subir todos los archivos
       for (const upload of uploads) {
@@ -184,15 +181,15 @@ const UploadDocument: React.FC = () => {
               <div className={styles.sectionHeader}>
                 <span className={styles.sectionEmoji}>📋</span>
                 <div>
-                  <h3 className={styles.sectionTitle}>Documentos Obligatorios</h3>
-                  <p className={styles.sectionDescription}>Complete todos los campos requeridos</p>
+                  <h3 className={styles.sectionTitle}>Documentos de la Propiedad</h3>
+                  <p className={styles.sectionDescription}>Cargue los documentos que tenga disponibles</p>
                 </div>
               </div>
               <div className={styles.fieldsGrid}>
-                {renderFileInput('titulo', '📄 Título de Propiedad', true)}
-                {renderFileInput('dni', '🆔 DNI de los Titulares', true)}
-                {renderFileInput('api', '📑 API', true)}
-                {renderFileInput('tgi', '🏢 TGI', true)}
+                {renderFileInput('titulo', '📄 Título de Propiedad', false)}
+                {renderFileInput('dni', '🆔 DNI de los Titulares', false)}
+                {renderFileInput('api', '📑 API', false)}
+                {renderFileInput('tgi', '🏢 TGI', false)}
               </div>
             </div>
 

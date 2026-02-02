@@ -99,6 +99,110 @@
   cursor: not-allowed;
 }
 
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btnChangePassword {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnChangePassword:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  transform: scale(1.05);
+}
+
+.passwordDisplay {
+  margin: 1.5rem 0;
+}
+
+.passwordDisplay label {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.passwordBox {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.passwordCode {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  color: #86efac;
+  letter-spacing: 1px;
+  background: transparent;
+}
+
+.btnCopy {
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: #7C3AED;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnCopy:hover {
+  background: rgba(124, 58, 237, 0.2);
+  border-color: #7C3AED;
+}
+
+.warningBox {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-left: 4px solid #f59e0b;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.warningBox p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.warningBox strong {
+  color: #fbbf24;
+}
+
+.errorText {
+  color: #fca5a5;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+
 .formCard, .tableCard {
   background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(10px);

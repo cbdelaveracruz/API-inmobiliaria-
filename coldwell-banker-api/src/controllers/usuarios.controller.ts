@@ -139,3 +139,69 @@ export const eliminarUsuario = async (req: Request, res: Response) => {
 };
 
 
+/**
+ * PUT /usuarios/:id/password
+ * Cambia la contraseña de un usuario (solo ADMIN)
+ */
+export const cambiarPassword = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { nuevaPassword } = req.body;
+    const userId = parseInt(id);
+
+    // Validar ID
+    if (isNaN(userId)) {
+      res.status(400).json({ 
+        error: 'ID de usuario inválido' 
+      });
+      return;
+    }
+
+    // Validar que venga la nueva contraseña
+    if (!nuevaPassword) {
+      res.status(400).json({ 
+        error: 'La nueva contraseña es requerida' 
+      });
+      return;
+    }
+
+    // Validar longitud mínima
+    if (nuevaPassword.length < 6) {
+      res.status(400).json({ 
+        error: 'La contraseña debe tener al menos 6 caracteres' 
+      });
+      return;
+    }
+
+    // Verificar que el usuario existe
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: userId }
+    });
+
+    if (!usuario) {
+      res.status(404).json({ 
+        error: 'Usuario no encontrado' 
+      });
+      return;
+    }
+
+    // Hashear la nueva contraseña
+    const nuevoHash = await bcrypt.hash(nuevaPassword, 10);
+
+    // Actualizar la contraseña
+    await prisma.usuario.update({
+      where: { id: userId },
+      data: { hash: nuevoHash }
+    });
+
+    res.json({
+      mensaje: 'Contraseña actualizada exitosamente'
+    });
+  } catch (error) {
+    console.error('Error al cambiar contraseña:', error);
+    res.status(500).json({ 
+      error: 'Error interno del servidor' 
+    });
+  }
+};
+

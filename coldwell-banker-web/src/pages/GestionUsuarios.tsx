@@ -1,6 +1,6 @@
 // src/pages/GestionUsuarios.tsx
 import { useState, useEffect } from 'react';
-import { Plus, UserCog, Trash2, Shield, User, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { Plus, UserCog, Trash2, Shield, User, AlertTriangle, Eye, EyeOff, Key, Copy, Check } from 'lucide-react';
 import api from '../services/api';
 import styles from './GestionUsuarios.module.css';
 
@@ -19,7 +19,16 @@ const GestionUsuarios = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [usuarioAEliminar, setUsuarioAEliminar] = useState<Usuario | null>(null);
   const [confirmText, setConfirmText] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // 👁️ Nuevo estado
+  const [showPassword, setShowPassword] = useState(false);
+  
+  // Estados para cambio de contraseña
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showPasswordSuccessModal, setShowPasswordSuccessModal] = useState(false);
+  const [usuarioACambiarPassword, setUsuarioACambiarPassword] = useState<Usuario | null>(null);
+  const [nuevaPassword, setNuevaPassword] = useState('');
+  const [passwordGenerada, setPasswordGenerada] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -52,11 +61,13 @@ const GestionUsuarios = () => {
 
     try {
       await api.post('/usuarios', formData);
-      setSuccess('✅ Usuario creado exitosamente');
+      
+      // Guardar la contraseña antes de limpiar el formulario
+      setPasswordGenerada(formData.password);
+      setShowPasswordSuccessModal(true);
       setFormData({ nombre: '', email: '', password: '', rol: 'ASESOR' });
       setShowForm(false);
       cargarUsuarios();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error al crear usuario');
     }
@@ -67,6 +78,44 @@ const GestionUsuarios = () => {
     setConfirmText('');
     setShowDeleteModal(true);
     setError('');
+  };
+
+  const iniciarCambioPassword = (usuario: Usuario) => {
+    setUsuarioACambiarPassword(usuario);
+    setNuevaPassword('');
+    setShowNewPassword(false);
+    setShowPasswordModal(true);
+    setError('');
+  };
+
+  const cambiarPasswordUsuario = async () => {
+    if (!usuarioACambiarPassword) return;
+
+    if (!nuevaPassword || nuevaPassword.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    try {
+      await api.put(`/usuarios/${usuarioACambiarPassword.id}/password`, {
+        nuevaPassword
+      });
+      
+      // Guardar la contraseña generada para mostrarla
+      setPasswordGenerada(nuevaPassword);
+      setShowPasswordModal(false);
+      setShowPasswordSuccessModal(true);
+      setNuevaPassword('');
+      setError('');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Error al cambiar contraseña');
+    }
+  };
+
+  const copiarAlPortapapeles = () => {
+    navigator.clipboard.writeText(passwordGenerada);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const confirmarEliminacion = async () => {
@@ -244,19 +293,143 @@ const GestionUsuarios = () => {
                 </td>
                 <td>{new Date(usuario.createdAt).toLocaleDateString('es-AR')}</td>
                 <td>
-                  <button
-                    className={styles.btnDelete}
-                    onClick={() => iniciarEliminacion(usuario)}
-                    title="Eliminar usuario"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  <div className={styles.actionButtons}>
+                    <button
+                      className={styles.btnChangePassword}
+                      onClick={() => iniciarCambioPassword(usuario)}
+                      title="Cambiar contraseña"
+                    >
+                      <Key size={18} />
+                    </button>
+                    <button
+                      className={styles.btnDelete}
+                      onClick={() => iniciarEliminacion(usuario)}
+                      title="Eliminar usuario"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Modal para cambiar contraseña */}
+      {showPasswordModal && usuarioACambiarPassword && (
+        <div className={styles.modalOverlay} onClick={() => setShowPasswordModal(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <Key size={48} color="#00AEEF" />
+              <h2>Cambiar Contraseña</h2>
+            </div>
+            
+            <p className={styles.modalText}>
+              Usuario: <strong>{usuarioACambiarPassword.nombre}</strong>
+            </p>
+
+            <div className={styles.formGroup}>
+              <label>Nueva Contraseña</label>
+              <div className={styles.passwordWrapper}>
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={nuevaPassword}
+                  onChange={(e) => setNuevaPassword(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                  minLength={6}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  className={styles.togglePassword}
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  title={showNewPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {error && <p className={styles.errorText}>{error}</p>}
+
+            <div className={styles.modalActions}>
+              <button 
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setNuevaPassword('');
+                  setError('');
+                }}
+                className={styles.btnSecondary}
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={cambiarPasswordUsuario}
+                className={styles.btnPrimary}
+                disabled={!nuevaPassword || nuevaPassword.length < 6}
+              >
+                Cambiar Contraseña
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de éxito - Mostrar contraseña generada */}
+      {showPasswordSuccessModal && (
+        <div className={styles.modalOverlay} onClick={() => {
+          setShowPasswordSuccessModal(false);
+          setPasswordGenerada('');
+          setCopied(false);
+        }}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <Check size={48} color="#10b981" />
+              <h2>Contraseña Actualizada</h2>
+            </div>
+            
+            <p className={styles.modalText}>
+              La contraseña ha sido actualizada exitosamente.
+            </p>
+
+            <div className={styles.passwordDisplay}>
+              <label>Nueva Contraseña:</label>
+              <div className={styles.passwordBox}>
+                <code className={styles.passwordCode}>{passwordGenerada}</code>
+                <button
+                  onClick={copiarAlPortapapeles}
+                  className={styles.btnCopy}
+                  title="Copiar al portapapeles"
+                >
+                  {copied ? <Check size={20} color="#10b981" /> : <Copy size={20} />}
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.warningBox}>
+              <AlertTriangle size={20} color="#f59e0b" />
+              <p>
+                <strong>Importante:</strong> Copiá esta contraseña ahora. 
+                Por seguridad, no podrás verla nuevamente una vez cerrado este mensaje.
+              </p>
+            </div>
+
+            <div className={styles.modalActions}>
+              <button 
+                onClick={() => {
+                  setShowPasswordSuccessModal(false);
+                  setPasswordGenerada('');
+                  setCopied(false);
+                }}
+                className={styles.btnPrimary}
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de confirmación de eliminación */}
       {showDeleteModal && usuarioAEliminar && (

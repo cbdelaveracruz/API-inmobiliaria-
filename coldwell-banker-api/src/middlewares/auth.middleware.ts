@@ -102,3 +102,20 @@ if (req.usuario?.rol !== 'ADMIN') {
 }
 next();
 };
+
+/**
+ * Middleware que verifica si el usuario es ADMIN o REVISOR
+ * Uso: router.put('/expedientes/:id/estado', autenticar, esAdminORevisor, controller)
+ */
+export const esAdminORevisor = (req: Request, res: Response, next: NextFunction) => {
+  const rol = req.usuario?.rol;
+  
+  if (rol !== 'ADMIN' && rol !== 'REVISOR') {
+    res.status(403).json({ 
+      error: 'Acceso denegado: se requiere rol ADMIN o REVISOR' 
+    });
+    return;
+  }
+  
+  next();
+};

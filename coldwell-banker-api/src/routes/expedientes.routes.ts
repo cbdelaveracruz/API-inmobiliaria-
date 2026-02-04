@@ -6,7 +6,7 @@ import {
   cambiarEstadoExpediente 
 } from '../controllers/expedientes.controller';
 import { generarMandatoCompleto } from '../controllers/mandatos-completo.controller';
-import { autenticar, esAdmin } from '../middlewares/auth.middleware';
+import { autenticar, esAdmin, esAdminORevisor } from '../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -42,12 +42,12 @@ router.post('/', autenticar, crearExpediente);
 /**
  * PUT /expedientes/:id/estado
  * PATCH /expedientes/:id/estado (alias para mobile)
- * Cambia el estado de un expediente
- * Requiere autenticación y rol ADMIN
+ * Cambia el estado de un expediente (APROBAR/RECHAZAR)
+ * Requiere autenticación y rol ADMIN o REVISOR
  * Body: { estado: "PENDIENTE" | "APROBADO" | "RECHAZADO" }
  */
-router.put('/:id/estado', autenticar, esAdmin, cambiarEstadoExpediente);
-router.patch('/:id/estado', autenticar, esAdmin, cambiarEstadoExpediente);
+router.put('/:id/estado', autenticar, esAdminORevisor, cambiarEstadoExpediente);
+router.patch('/:id/estado', autenticar, esAdminORevisor, cambiarEstadoExpediente);
 
 /**
  * GET /propiedades/:id/mandato/word-completo

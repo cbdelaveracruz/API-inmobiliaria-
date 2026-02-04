@@ -486,6 +486,11 @@
   font-size: 0.95rem;
 }
 
+.docType {
+  font-weight: 600;
+}
+
+
 .viewDocButton {
   color: #00AEEF;
   text-decoration: none;

@@ -85,6 +85,17 @@ const PropiedadDetail = () => {
     user?.rol === 'REVISOR' || 
     (user?.rol === 'ASESOR' && propiedad?.asesor?.id === user?.id));
 
+  // Helper para formatear tipos de documentos
+  const formatDocumentType = (tipo: string): string => {
+    const tipos: Record<string, string> = {
+      'TITULO': '📄 Título de Propiedad',
+      'DNI': '📄 DNI del Propietario',
+      'API': '📄 API',
+      'TGI': '📄 TGI',
+    };
+    return tipos[tipo] || tipo;
+  };
+
   useEffect(() => {
     if (id) {
       fetchPropiedad();
@@ -433,6 +444,7 @@ const PropiedadDetail = () => {
                   <table>
                     <thead>
                       <tr>
+                        <th>Tipo de Documento</th>
                         <th>Nombre del Archivo</th>
                         <th>Fecha de Carga</th>
                         <th>Acciones</th>
@@ -441,7 +453,10 @@ const PropiedadDetail = () => {
                     <tbody>
                       {propiedad.documentos.map((doc) => (
                         <tr key={doc.id}>
-                          <td>{doc.nombre || doc.tipo}</td>
+                          <td className={styles.docType}>
+                            <strong>{formatDocumentType(doc.tipo)}</strong>
+                          </td>
+                          <td>{doc.nombre || 'Sin nombre'}</td>
                           <td>
                             {new Date(doc.createdAt).toLocaleDateString('es-AR', {
                               day: '2-digit',

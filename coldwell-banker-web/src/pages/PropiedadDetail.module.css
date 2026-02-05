@@ -34,6 +34,36 @@
   transform: translateY(-2px);
 }
 
+/* Top actions container */
+.topActions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.editButton {
+  background: rgba(255, 193, 7, 0.9);
+  border: 2px solid rgba(255, 193, 7, 1);
+  color: #1a1a1a;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 3px 10px rgba(255, 193, 7, 0.2);
+}
+
+.editButton:hover {
+  background: rgba(255, 193, 7, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+}
+
 /* ========== CARD/PANEL ========== */
 .card {
   background: #001a4d;

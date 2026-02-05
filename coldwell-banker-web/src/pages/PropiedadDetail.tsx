@@ -79,6 +79,13 @@ const PropiedadDetail = () => {
   // Verificar si el usuario puede cambiar el estado
   const canChangeStatus = user?.rol === 'ADMIN' || user?.rol === 'REVISOR';
 
+  // Verificar si el usuario puede editar la propiedad (solo si está PENDIENTE)
+  const canEditProperty = 
+    propiedad?.estado === 'PENDIENTE' &&
+    (user?.rol === 'ADMIN' || 
+     user?.rol === 'REVISOR' || 
+     (user?.rol === 'ASESOR' && propiedad?.asesor?.id === user?.id));
+
   const canDownloadMandato = 
     propiedad?.mandato &&
     (user?.rol === 'ADMIN' || 
@@ -229,10 +236,20 @@ const PropiedadDetail = () => {
           </div>
         )}
 
-        {/* Back Button */}
-        <button onClick={() => navigate('/propiedades')} className={styles.backButton}>
-          ← Volver
-        </button>
+        {/* Back and Edit Buttons */}
+        <div className={styles.topActions}>
+          <button onClick={() => navigate('/propiedades')} className={styles.backButton}>
+            ← Volver
+          </button>
+          {canEditProperty && (
+            <button 
+              onClick={() => navigate(`/propiedades/${id}/editar`)} 
+              className={styles.editButton}
+            >
+              ✏️ Editar Propiedad
+            </button>
+          )}
+        </div>
 
         <div className={styles.card}>
           {/* Header: Título + Estado + Admin Actions */}

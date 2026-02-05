@@ -1,6 +1,6 @@
 // src/pages/NuevaPropiedad.tsx
-import React, { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, type FormEvent } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import apiClient from '../services/api';
 import { logger } from '../utils/logger';
 import { sanitizeString, validateLength } from '../utils/validation';
@@ -35,6 +35,9 @@ interface Propietario {
 }
 
 const NuevaPropiedad: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const isEditMode = !!id;
+  
   const [titulo, setTitulo] = useState('');
   const [tipoPropiedad, setTipoPropiedad] = useState('');
   const [direccion, setDireccion] = useState('');
@@ -42,6 +45,7 @@ const NuevaPropiedad: React.FC = () => {
   const [localidad, setLocalidad] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(isEditMode);
   const navigate = useNavigate();
 
   // Estado para propietarios dinámicos
@@ -57,6 +61,45 @@ const NuevaPropiedad: React.FC = () => {
   });
 
   const [propietarios, setPropietarios] = useState<Propietario[]>([emptyOwner()]);
+
+  // Cargar datos en modo edición
+  useEffect(() => {
+    if (!isEditMode || !id) return;
+
+    const cargarPropiedad = async () => {
+      try {
+        setLoadingData(true);
+        const response = await apiClient.get(`/expedientes/${id}`);
+        const data = response.data;
+
+        // Cargar datos básicos
+        setTitulo(data.titulo || '');
+        setTipoPropiedad(data.tipoPropiedad || '');
+        setDireccion(data.direccion || '');
+        setPartidaInmobiliaria(data.partidaInmobiliaria || '');
+        setLocalidad(data.localidad || '');
+
+        // Cargar propietarios si existen
+        if (data.propietarios) {
+          try {
+            const propietariosData = JSON.parse(data.propietarios);
+            if (Array.isArray(propietariosData) && propietariosData.length > 0) {
+              setPropietarios(propietariosData);
+            }
+          } catch (e) {
+            logger.debug('Error parsing propietarios:', e);
+          }
+        }
+
+        setLoadingData(false);
+      } catch (err: any) {
+        setError(err?.response?.data?.error || 'Error al cargar la propiedad');
+        setLoadingData(false);
+      }
+    };
+
+    cargarPropiedad();
+  }, [id, isEditMode]);
 
   // Manejar cambios en cantidad de propietarios
   const handleCantidadChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -113,8 +156,12 @@ const NuevaPropiedad: React.FC = () => {
       const body: any = {
         titulo: tituloSanitized,
         tipoPropiedad: tipoSanitized,
-        estado: 'PENDIENTE',
       };
+
+      // En modo edición no enviamos estado
+      if (!isEditMode) {
+        body.estado = 'PENDIENTE';
+      }
 
       if (direccionSanitized) {
         body.direccion = direccionSanitized;
@@ -130,11 +177,13 @@ const NuevaPropiedad: React.FC = () => {
 
       logger.debug('📤 Enviando al backend:', body);
 
-      const response = await apiClient.post<CreatedPropiedadResponse>('/expedientes', body);
+      const response = isEditMode
+        ? await apiClient.put<CreatedPropiedadResponse>(`/expedientes/${id}`, body)
+        : await apiClient.post<CreatedPropiedadResponse>('/expedientes', body);
 
       logger.debug('✅ Respuesta del backend:', response.data);
 
-      const propiedadId = response.data?.expediente?.id;
+      const propiedadId = isEditMode ? id : response.data?.expediente?.id;
 
       if (!propiedadId) {
         navigate('/propiedades');
@@ -146,7 +195,7 @@ const NuevaPropiedad: React.FC = () => {
       setError(
         err?.response?.data?.error ||
           err?.response?.data?.mensaje ||
-          'Error al crear la propiedad. Intentá nuevamente.'
+          `Error al ${isEditMode ? 'actualizar' : 'crear'} la propiedad. Intentá nuevamente.`
       );
     } finally {
       setLoading(false);
@@ -157,13 +206,28 @@ const NuevaPropiedad: React.FC = () => {
     navigate('/propiedades');
   };
 
+  if (loadingData) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.wrapper}>
+          <p>Cargando propiedad...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <div className={styles.card}>
-          <h1 className={styles.title}>Cargar nueva propiedad</h1>
+          <h1 className={styles.title}>
+            {isEditMode ? 'Editar Propiedad' : 'Cargar nueva propiedad'}
+          </h1>
           <p className={styles.subtitle}>
-            Completá los datos de la propiedad. Después podrás subir los documentos necesarios.
+            {isEditMode 
+              ? 'Modificá los datos que necesites corregir.'
+              : 'Completá los datos de la propiedad. Después podrás subir los documentos necesarios.'
+            }
           </p>
 
           <form onSubmit={handleSubmit} className={styles.form}>
@@ -449,17 +513,22 @@ const NuevaPropiedad: React.FC = () => {
                 Cancelar
               </button>
               <button type="submit" disabled={loading} className={styles.submitButton}>
-                {loading ? 'Creando...' : 'CREAR PROPIEDAD'}
+                {loading 
+                  ? (isEditMode ? 'Guardando...' : 'Creando...') 
+                  : (isEditMode ? 'GUARDAR CAMBIOS' : 'CREAR PROPIEDAD')
+                }
               </button>
             </div>
           </form>
 
-          <div className={styles.infoBox}>
-            <div className={styles.infoIcon}>ℹ️</div>
-            <p className={styles.infoText}>
-              La propiedad se creará con estado <strong>PENDIENTE</strong>. Un revisor o administrador podrá cambiar el estado más adelante.
-            </p>
-          </div>
+          {!isEditMode && (
+            <div className={styles.infoBox}>
+              <div className={styles.infoIcon}>ℹ️</div>
+              <p className={styles.infoText}>
+                La propiedad se creará con estado <strong>PENDIENTE</strong>. Un revisor o administrador podrá cambiar el estado más adelante.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

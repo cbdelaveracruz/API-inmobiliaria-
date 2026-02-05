@@ -510,3 +510,132 @@ export const cambiarEstadoExpediente = async (req: Request, res: Response) => {
         });
     }
 };
+
+/**
+ * PUT /expedientes/:id
+ * Actualiza un expediente existente
+ * 
+ * Permisos:
+ * - ASESOR: Solo puede editar sus propios expedientes EN ESTADO PENDIENTE
+ * - REVISOR/ADMIN: Pueden editar cualquier expediente EN ESTADO PENDIENTE
+ *
+ * Restricción: Solo se pueden editar expedientes con estado PENDIENTE
+ */
+export const actualizarExpediente = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const expedienteId = parseInt(id);
+    const userId = req.usuario?.id;
+    const userRol = req.usuario?.rol;
+
+    // Validar ID
+    if (isNaN(expedienteId)) {
+      res.status(400).json({ error: 'ID de expediente inválido' });
+      return;
+    }
+
+    // Buscar expediente existente
+    const expedienteExistente = await prisma.expediente.findUnique({
+      where: { id: expedienteId },
+      select: {
+        id: true,
+        estado: true,
+        asesorId: true
+      }
+    });
+
+    if (!expedienteExistente) {
+      res.status(404).json({ error: 'Expediente no encontrado' });
+      return;
+    }
+
+    // Verificar que el expediente esté en estado PENDIENTE
+    if (expedienteExistente.estado !== 'PENDIENTE') {
+      res.status(403).json({ 
+        error: `No se puede editar un expediente en estado ${expedienteExistente.estado}. Solo se pueden editar expedientes PENDIENTES.` 
+      });
+      return;
+    }
+
+    // Verificar permisos: ASESOR solo puede editar sus propios expedientes
+    if (userRol === 'ASESOR' && expedienteExistente.asesorId !== userId) {
+      res.status(403).json({ 
+        error: 'No tienes permiso para editar este expediente' 
+      });
+      return;
+    }
+
+    // Extraer campos del body
+    const {
+      titulo,
+      descripcion,
+      propietarioNombre,
+      direccion,
+      localidad,
+      api,
+      partidaInmobiliaria,
+      tipoPropiedad,
+      propietarios,
+      emails
+    } = req.body;
+
+    // Validar campos requeridos
+    if (!titulo) {
+      res.status(400).json({ error: 'El título es requerido' });
+      return;
+    }
+
+    // Auto-poblar propietarioNombre desde el array de propietarios
+    let propietarioNombreAuto = propietarioNombre?.trim() || null;
+    
+    if (propietarios && Array.isArray(propietarios) && propietarios.length > 0) {
+      const nombres = propietarios
+        .map((p: any) => p.nombreCompleto)
+        .filter((nombre: string) => nombre && nombre.trim())
+        .join(', ');
+      
+      if (nombres) {
+        propietarioNombreAuto = nombres;
+      }
+    }
+
+    // Actualizar el expediente
+    // @ts-ignore - Los tipos de Prisma se actualizan al reiniciar VS Code
+    const expedienteActualizado = await prisma.expediente.update({
+      where: { id: expedienteId },
+      data: {
+        titulo: titulo.trim(),
+        descripcion: descripcion?.trim() || null,
+        propietarioNombre: propietarioNombreAuto,
+        direccion: direccion?.trim() || null,
+        localidad: localidad?.trim() || null,
+        api: api?.trim() || null,
+        partidaInmobiliaria: partidaInmobiliaria?.trim() || null,
+        tipoPropiedad: tipoPropiedad?.trim() || null,
+        propietarios: propietarios ? JSON.stringify(propietarios) : null,
+        emails: emails?.trim() || null
+      },
+      include: {
+        asesor: {
+          select: {
+            id: true,
+            nombre: true,
+            email: true,
+            rol: true
+          }
+        },
+        documentos: true,
+        mandato: true
+      }
+    });
+
+    res.json({
+      mensaje: 'Expediente actualizado exitosamente',
+      expediente: expedienteActualizado
+    });
+
+  } catch (error) {
+    console.error('Error al actualizar expediente:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};

@@ -27,6 +27,7 @@ function App() {
             <Route path="/propiedades" element={<PropiedadesList />} />
             <Route path="/propiedades/nueva" element={<NuevaPropiedad />} />
             <Route path="/propiedades/:id" element={<PropiedadDetail />} />
+            <Route path="/propiedades/:id/editar" element={<NuevaPropiedad />} />
             <Route path="/propiedades/:id/mandato" element={<MandatoForm />} />
             <Route path="/propiedades/:id/upload" element={<UploadDocument />} />
             <Route path="/usuarios" element={<GestionUsuarios />} />

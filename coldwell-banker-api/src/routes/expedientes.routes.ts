@@ -3,7 +3,8 @@ import {
   listarExpedientes, 
   obtenerExpediente, 
   crearExpediente, 
-  cambiarEstadoExpediente 
+  cambiarEstadoExpediente,
+  actualizarExpediente
 } from '../controllers/expedientes.controller';
 import { generarMandatoCompleto } from '../controllers/mandatos-completo.controller';
 import { autenticar, esAdmin, esAdminORevisor } from '../middlewares/auth.middleware';
@@ -38,6 +39,14 @@ router.get('/:id', autenticar, obtenerExpediente);
  * El usuarioId se toma del token (req.usuario.id)
  */
 router.post('/', autenticar, crearExpediente);
+
+/**
+ * PUT /expedientes/:id
+ * Actualizar un expediente (solo PENDIENTE)
+ * - ASESOR: Solo puede editar sus propias propiedades PENDIENTES
+ * - ADMIN/REVISOR: Pueden editar cualquier propiedad PENDIENTE
+ */
+router.put('/:id', autenticar, actualizarExpediente);
 
 /**
  * PUT /expedientes/:id/estado

@@ -611,7 +611,7 @@ const PropiedadDetail = () => {
         </div>
 
         {/* Modal para cambiar estado */}
-        {showModal && (
+        {showModal && propiedad.estado !== 'EN_PREPARACION' && (
           <ChangeStatusModal
             expedienteId={propiedad.id}
             estadoActual={propiedad.estado}

@@ -200,6 +200,19 @@ export const crearDocumento = async (req: Request, res: Response) => {
           url: fileUrl
         }
       });
+
+      // Registrar en historial
+      try {
+        await prisma.historialCambio.create({
+          data: {
+            expedienteId: expId,
+            usuarioId: req.usuario!.id,
+            accion: 'DOCUMENTO_SUBIDO',
+            detalle: `Subió documento ${tipoDocumento}: ${nombre?.trim() || archivo.originalname}`
+          }
+        });
+      } catch (e) { /* No bloquear si falla el historial */ }
+
       return;
     } else {
         // Si el content-type era multipart pero no hay file, Multer lo rechazó
@@ -264,6 +277,18 @@ export const crearDocumento = async (req: Request, res: Response) => {
       mensaje: 'Documento creado exitosamente',
       documento: nuevoDocumento
     });
+
+    // Registrar en historial
+    try {
+      await prisma.historialCambio.create({
+        data: {
+          expedienteId: expId,
+          usuarioId: req.usuario!.id,
+          accion: 'DOCUMENTO_SUBIDO',
+          detalle: `Subió documento ${tipo}: ${nombre?.trim() || 'sin nombre'}`
+        }
+      });
+    } catch (e) { /* No bloquear si falla el historial */ }
 
   } catch (error) {
     console.error('Error al crear documento:', error);

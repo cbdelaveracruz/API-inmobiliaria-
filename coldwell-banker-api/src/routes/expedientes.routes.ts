@@ -7,7 +7,8 @@ import {
   marcarObservacionesVistas,
   eliminarExpediente,
   enviarARevision,
-  marcarDocumentoVisto
+  marcarDocumentoVisto,
+  obtenerHistorial
 } from '../controllers/expedientes.controller';
 import { generarMandatoCompleto } from '../controllers/mandatos-completo.controller';
 import { autenticar, esAdmin, esAdminORevisor } from '../middlewares/auth.middleware';
@@ -96,5 +97,12 @@ router.get('/:id/mandato/word-completo', autenticar, generarMandatoCompleto);
  * Eliminar expediente (solo ADMIN)
  */
 router.delete('/:id', autenticar, esAdmin, eliminarExpediente);
+
+/**
+ * GET /expedientes/:id/historial
+ * Obtiene el historial de cambios de una propiedad
+ * Requiere autenticación
+ */
+router.get('/:id/historial', autenticar, obtenerHistorial);
 
 export default router;

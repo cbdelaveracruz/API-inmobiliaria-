@@ -389,6 +389,17 @@ export const crearExpediente = async (req: Request, res: Response) => {
             }
         });
 
+        // Registrar en historial
+        await prisma.historialCambio.create({
+            data: {
+                expedienteId: nuevoExpediente.id,
+                usuarioId: usuarioId,
+                accion: 'CREACION',
+                detalle: `Creó la propiedad "${titulo.trim()}"`,
+                estadoNuevo: 'EN_PREPARACION'
+            }
+        });
+
         res.status(201).json({
             mensaje: 'Expediente creado exitosamente',
             expediente: nuevoExpediente
@@ -495,6 +506,23 @@ export const cambiarEstadoExpediente = async (req: Request, res: Response) => {
                         rol: true
                     }
                 }
+            }
+        });
+
+        // Registrar cambio de estado en historial
+        const estadoAnterior = expedienteExistente.estado;
+        let detalleHistorial = `Cambió estado de ${estadoAnterior} a ${estado}`;
+        if (estado === 'RECHAZADO' && observaciones) {
+            detalleHistorial += `. Observaciones: ${observaciones.trim()}`;
+        }
+        await prisma.historialCambio.create({
+            data: {
+                expedienteId,
+                usuarioId: req.usuario!.id,
+                accion: 'CAMBIO_ESTADO',
+                detalle: detalleHistorial,
+                estadoAnterior,
+                estadoNuevo: estado
             }
         });
 
@@ -697,6 +725,18 @@ export const enviarARevision = async (req: Request, res: Response) => {
       }
     });
 
+    // Registrar en historial
+    await prisma.historialCambio.create({
+        data: {
+            expedienteId,
+            usuarioId: userId!,
+            accion: 'ENVIO_REVISION',
+            detalle: 'Envió la propiedad a revisión',
+            estadoAnterior: 'EN_PREPARACION',
+            estadoNuevo: 'PENDIENTE'
+        }
+    });
+
     res.json({ 
       mensaje: 'Propiedad enviada a revisión exitosamente',
       expediente: expedienteActualizado 
@@ -752,6 +792,42 @@ export const marcarDocumentoVisto = async (req: Request, res: Response) => {
     res.json({ mensaje: 'Documento marcado como visto' });
   } catch (error) {
     console.error('Error al marcar documento:', error instanceof Error ? error.message : 'Unknown');
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
+/**
+ * GET /expedientes/:id/historial
+ * Obtiene el historial de cambios de un expediente
+ * Disponible para todos los usuarios autenticados
+ */
+export const obtenerHistorial = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const expedienteId = parseInt(id);
+
+    if (isNaN(expedienteId)) {
+      res.status(400).json({ error: 'ID de expediente inválido' });
+      return;
+    }
+
+    const historial = await prisma.historialCambio.findMany({
+      where: { expedienteId },
+      include: {
+        usuario: {
+          select: { id: true, nombre: true, rol: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json({
+      expedienteId,
+      total: historial.length,
+      historial
+    });
+  } catch (error) {
+    console.error('Error al obtener historial:', error instanceof Error ? error.message : 'Unknown');
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 };

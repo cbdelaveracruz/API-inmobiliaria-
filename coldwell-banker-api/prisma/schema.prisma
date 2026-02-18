@@ -23,7 +23,8 @@ model Usuario {
   expedientes          Expediente[]            @relation("AsesorExpedientes")
   actividadesSemanales ActividadSemanal[]      @relation("AsesorActividades")
   objetivosConfig      ObjetivoConfiguracion[] @relation("AsesorObjetivosConfiguracion")
-  documentosVistos     DocumentoVisto[]      // 🆕 Documentos que este usuario marcó como vistos
+  documentosVistos     DocumentoVisto[]      // Documentos que este usuario marcó como vistos
+  historialCambios     HistorialCambio[]     // Cambios realizados por este usuario
 }
 
 
@@ -57,6 +58,7 @@ model Expediente {
   documentos          Documento[]
   mandato             Mandato?
   informe             InformeIA?
+  historial           HistorialCambio[]     // Historial de todos los cambios
 }
 
 enum Estado {
@@ -183,5 +185,22 @@ model DocumentoVisto {
   
   @@unique([documentoId, usuarioId]) // Un usuario solo puede marcar 1 vez el mismo doc
   @@index([documentoId])
+  @@index([usuarioId])
+}
+
+// ===== Historial de cambios en expedientes =====
+model HistorialCambio {
+  id             Int        @id @default(autoincrement())
+  expediente     Expediente @relation(fields: [expedienteId], references: [id], onDelete: Cascade)
+  expedienteId   Int
+  usuario        Usuario    @relation(fields: [usuarioId], references: [id])
+  usuarioId      Int
+  accion         String     // CREACION, CAMBIO_ESTADO, EDICION, DOCUMENTO_SUBIDO, ENVIO_REVISION
+  detalle        String?    // Descripción legible, ej: "Cambió estado de PENDIENTE a APROBADO"
+  estadoAnterior String?    // Estado antes del cambio (si aplica)
+  estadoNuevo    String?    // Estado después del cambio (si aplica)
+  createdAt      DateTime   @default(now())
+
+  @@index([expedienteId])
   @@index([usuarioId])
 }

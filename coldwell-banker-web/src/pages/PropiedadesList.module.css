@@ -281,6 +281,11 @@
   color: #78350f;
 }
 
+.badgeEN_PREPARACION {
+  background: #94a3b8;
+  color: #1e293b;
+}
+
 .cardBody {
   display: flex;
   flex-direction: column;

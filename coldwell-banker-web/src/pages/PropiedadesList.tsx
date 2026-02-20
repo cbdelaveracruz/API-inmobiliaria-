@@ -26,7 +26,7 @@ interface Propiedad {
   id: number;
   titulo: string;
   propietarioNombre: string;
-  estado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
+  estado: 'EN_PREPARACION' | 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
   observaciones?: string | null;
   createdAt: string;
   asesor?: Usuario | null;
@@ -318,9 +318,10 @@ const PropiedadesList: React.FC = () => {
                 <div className={styles.cardHeader}>
                   <h3 className={styles.cardTitle}>{prop.titulo}</h3>
                   <span className={`${styles.badge} ${styles[`badge${prop.estado}`]}`}>
-                    {prop.estado === 'APROBADO' ? 'Aprobado' : 
-                     prop.estado === 'RECHAZADO' ? 'Rechazado' : 
-                     'En espera'}
+                    {prop.estado === 'APROBADO' ? 'Aprobado' :
+                     prop.estado === 'RECHAZADO' ? 'Rechazado' :
+                     prop.estado === 'PENDIENTE' ? 'Pendiente' :
+                     'En Preparación'}
                   </span>
                 </div>
 

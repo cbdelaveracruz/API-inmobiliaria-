@@ -43,6 +43,7 @@ const GestionUsuarios = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [deleteModalError, setDeleteModalError] = useState('');
 
   useEffect(() => {
     cargarUsuarios();
@@ -82,6 +83,7 @@ const GestionUsuarios = () => {
   const iniciarEliminacion = (usuario: Usuario) => {
     setUsuarioAEliminar(usuario);
     setConfirmText('');
+    setDeleteModalError('');
     setShowDeleteModal(true);
     setError('');
   };
@@ -131,7 +133,7 @@ const GestionUsuarios = () => {
     const textoValido = confirmText.toLowerCase() === 'borrar' || confirmText.toLowerCase() === 'eliminar';
     
     if (!textoValido) {
-      setError('Debes escribir "borrar" o "eliminar" para confirmar');
+      setDeleteModalError('Debes escribir "borrar" o "eliminar" para confirmar');
       return;
     }
 
@@ -141,10 +143,11 @@ const GestionUsuarios = () => {
       setShowDeleteModal(false);
       setUsuarioAEliminar(null);
       setConfirmText('');
+      setDeleteModalError('');
       cargarUsuarios();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Error al eliminar usuario');
+      setDeleteModalError(err.response?.data?.error || 'Error al eliminar usuario');
     }
   };
 
@@ -461,7 +464,7 @@ const GestionUsuarios = () => {
 
       {/* Modal de confirmación de eliminación */}
       {showDeleteModal && usuarioAEliminar && (
-        <div className={styles.modalOverlay} onClick={() => setShowDeleteModal(false)}>
+        <div className={styles.modalOverlay} onClick={() => { setShowDeleteModal(false); setDeleteModalError(''); }}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <AlertTriangle size={48} color="#ef4444" />
@@ -487,12 +490,18 @@ const GestionUsuarios = () => {
               />
             </div>
 
+            {deleteModalError && (
+              <p className={styles.errorText} style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
+                ⚠️ {deleteModalError}
+              </p>
+            )}
+
             <div className={styles.modalActions}>
               <button 
                 onClick={() => {
                   setShowDeleteModal(false);
                   setConfirmText('');
-                  setError('');
+                  setDeleteModalError('');
                 }}
                 className={styles.btnSecondary}
               >

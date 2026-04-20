@@ -95,9 +95,18 @@ const PropiedadDetail = () => {
   // Verificar si el usuario puede editar la propiedad
   // Asesores pueden editar EN_PREPARACION, PENDIENTE y RECHAZADO (si es suya)
   // ADMIN/REVISOR pueden editar PENDIENTE o EN_PREPARACION
+  const userRol = user?.rol?.toUpperCase();
   const canEditProperty = 
-    ((propiedad?.estado === 'EN_PREPARACION' || propiedad?.estado === 'PENDIENTE') && (user?.rol === 'ADMIN' || user?.rol === 'REVISOR')) ||
-    ((propiedad?.estado === 'EN_PREPARACION' || propiedad?.estado === 'PENDIENTE' || propiedad?.estado === 'RECHAZADO') && (user?.rol === 'ASESOR' && propiedad?.asesor?.id === user?.id));
+    ((propiedad?.estado === 'EN_PREPARACION' || propiedad?.estado === 'PENDIENTE') && (userRol === 'ADMIN' || userRol === 'REVISOR')) ||
+    ((propiedad?.estado === 'EN_PREPARACION' || propiedad?.estado === 'PENDIENTE' || propiedad?.estado === 'RECHAZADO') && (userRol === 'ASESOR' && (propiedad?.asesor?.id == user?.id || propiedad?.asesorId == user?.id)));
+
+  console.log('DEBUG [PropiedadDetail]:', {
+    estado: propiedad?.estado,
+    userRol,
+    userId: user?.id,
+    asesorId: propiedad?.asesor?.id || propiedad?.asesorId,
+    canEditProperty
+  });
 
   const canDownloadMandato = 
     propiedad?.mandato &&

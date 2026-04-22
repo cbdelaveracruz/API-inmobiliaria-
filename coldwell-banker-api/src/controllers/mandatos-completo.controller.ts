@@ -336,13 +336,22 @@ export const generarMandatoCompleto = async (req: Request, res: Response) => {
       });
 
       // Configurar headers para descarga
+      // Sanitizar el título para evitar caracteres no-ASCII en el header HTTP
+      const tituloSanitizado = expediente.titulo
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // quitar acentos
+        .replace(/[^a-zA-Z0-9\s-]/g, '') // solo alfanuméricos, espacios y guiones
+        .replace(/\s+/g, '-') // espacios a guiones
+        .replace(/-+/g, '-') // múltiples guiones a uno
+        .replace(/^-|-$/g, ''); // quitar guiones al inicio/final
+
       res.setHeader(
         'Content-Type',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       );
       res.setHeader(
         'Content-Disposition',
-        `attachment; filename="mandato-${expediente.titulo.replace(/\s/g, '-')}-${expedienteId}.docx"`
+        `attachment; filename="mandato-${tituloSanitizado}-${expedienteId}.docx"`
       );
 
       console.log('✅ Documento generado exitosamente');

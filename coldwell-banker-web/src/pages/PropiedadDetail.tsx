@@ -76,11 +76,11 @@ const PropiedadDetail = () => {
   const [downloadError, setDownloadError] = useState('');
   const [downloadingWord, setDownloadingWord] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [enviandoRevision, setEnviandoRevision] = useState(false);
   
   // 🆕 Estados para gestión de documentos
-  const [deletingDocId, setDeletingDocId] = useState<number | null>(null);
   const [replacingDocId, setReplacingDocId] = useState<number | null>(null);
   const [processingDocId, setProcessingDocId] = useState<number | null>(null);
   
@@ -181,7 +181,7 @@ const PropiedadDetail = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
 
-  const descargarDocumento = async (docId: number) => {
+  const handleDocumentoClick = async (docId: number) => {
     try {
       const response = await api.get(`/documentos/${docId}/download`, {
         responseType: 'blob'
@@ -194,6 +194,15 @@ const PropiedadDetail = () => {
       
       // Liberar la URL después de un tiempo para que la pestaña cargue
       setTimeout(() => window.URL.revokeObjectURL(url), 10000);
+      
+      // Marcar documento como visto
+      try {
+        await api.post(`/documentos/${docId}/marcar-visto`);
+        // Refrescar para mostrar el check de visto
+        fetchPropiedad();
+      } catch (err) {
+        console.error('Error al marcar como visto:', err);
+      }
     } catch (err) {
       console.error('Error al abrir documento:', err);
       throw err;

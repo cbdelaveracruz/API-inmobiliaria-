@@ -1220,3 +1220,147 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ========== CLICKABLE SECTION TITLE ========== */
+.clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+.clickable:hover {
+  color: #00AEEF;
+}
+
+.toggleIcon {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: #8a9fb8;
+  transition: transform 0.3s;
+}
+
+/* ========== HISTORIAL DE CAMBIOS ========== */
+.historialContainer {
+  margin-top: 1rem;
+}
+
+.historialLoading,
+.historialEmpty {
+  color: #8a9fb8;
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.historialTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.historialTimeline::before {
+  content: '';
+  position: absolute;
+  left: 18px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(0, 174, 239, 0.2);
+}
+
+.historialItem {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.2s;
+}
+
+.historialItem:hover {
+  background: rgba(0, 174, 239, 0.04);
+  border-radius: 8px;
+}
+
+.historialItem:last-child {
+  border-bottom: none;
+}
+
+.historialIcon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: rgba(0, 26, 77, 0.9);
+  border: 2px solid rgba(0, 174, 239, 0.3);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.historialContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.historialHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.historialUser {
+  font-weight: 700;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.historialRol {
+  background: rgba(0, 174, 239, 0.15);
+  color: #00AEEF;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.historialDetalle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin: 0 0 0.3rem 0;
+  line-height: 1.4;
+}
+
+.historialFecha {
+  color: #8a9fb8;
+  font-size: 0.8rem;
+}
+
+/* ========== HISTORIAL RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .historialTimeline::before {
+    left: 14px;
+  }
+
+  .historialIcon {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    font-size: 0.9rem;
+  }
+
+  .historialHeader {
+    flex-wrap: wrap;
+  }
+
+  .historialDetalle {
+    font-size: 0.85rem;
+  }
+}

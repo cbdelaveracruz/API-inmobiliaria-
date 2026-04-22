@@ -31,6 +31,20 @@ interface Mandato {
   createdAt: string;
 }
 
+interface HistorialCambio {
+  id: number;
+  accion: string;
+  detalle: string | null;
+  estadoAnterior: string | null;
+  estadoNuevo: string | null;
+  createdAt: string;
+  usuario: {
+    id: number;
+    nombre: string;
+    rol: string;
+  } | null;
+}
+
 interface PropietarioDetalle {
   nombreCompleto: string;
   dni: string;
@@ -85,6 +99,11 @@ const PropiedadDetail = () => {
   const [processingDocId, setProcessingDocId] = useState<number | null>(null);
   
   const [propietariosList, setPropietariosList] = useState<PropietarioDetalle[]>([]);
+  
+  // Historial de cambios
+  const [historial, setHistorial] = useState<HistorialCambio[]>([]);
+  const [historialOpen, setHistorialOpen] = useState(false);
+  const [historialLoading, setHistorialLoading] = useState(false);
 
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -107,6 +126,12 @@ const PropiedadDetail = () => {
     asesorId: propiedad?.asesor?.id || propiedad?.asesorId,
     canEditProperty
   });
+
+  // Permiso separado para gestionar documentos (reemplazar/eliminar)
+  // ADMIN siempre puede, asesor dueño puede siempre (backend valida permisos)
+  const canManageDocuments = 
+    userRol === 'ADMIN' || 
+    (userRol === 'ASESOR' && (propiedad?.asesor?.id == user?.id || propiedad?.asesorId == user?.id));
 
   const canDownloadMandato = 
     propiedad?.mandato &&
@@ -701,7 +726,7 @@ const PropiedadDetail = () => {
                                   📄 Ver
                                 </button>
 
-                                {canEditProperty && (
+                                {canManageDocuments && (
                                   <>
                                     <button
                                       onClick={() => {
@@ -756,6 +781,85 @@ const PropiedadDetail = () => {
                 >
                   Subir Documentación
                 </button>
+              </div>
+            )}
+          </div>
+
+          {/* 📋 Historial de Cambios */}
+          <div className={styles.section}>
+            <h3 
+              className={`${styles.sectionTitle} ${styles.clickable}`}
+              onClick={() => {
+                if (!historialOpen && historial.length === 0) {
+                  // Cargar historial al abrir por primera vez
+                  setHistorialLoading(true);
+                  api.get(`/expedientes/${id}/historial`)
+                    .then(res => {
+                      setHistorial(res.data.historial || []);
+                    })
+                    .catch(err => {
+                      console.error('Error al cargar historial:', err);
+                    })
+                    .finally(() => setHistorialLoading(false));
+                }
+                setHistorialOpen(!historialOpen);
+              }}
+            >
+              <span className={styles.sectionIcon}>📋</span>
+              Historial de Cambios
+              <span className={styles.toggleIcon}>{historialOpen ? '▲' : '▼'}</span>
+            </h3>
+
+            {historialOpen && (
+              <div className={styles.historialContainer}>
+                {historialLoading ? (
+                  <p className={styles.historialLoading}>Cargando historial...</p>
+                ) : historial.length === 0 ? (
+                  <p className={styles.historialEmpty}>No hay cambios registrados aún.</p>
+                ) : (
+                  <div className={styles.historialTimeline}>
+                    {historial.map((cambio) => {
+                      const iconMap: Record<string, string> = {
+                        'CREACION': '🆕',
+                        'CAMBIO_ESTADO': '🔄',
+                        'EDICION': '✏️',
+                        'ENVIO_REVISION': '📤',
+                        'DOCUMENTO_SUBIDO': '📄',
+                        'DOCUMENTO_ACTUALIZADO': '🔁',
+                        'DOCUMENTO_ELIMINADO': '🗑️',
+                      };
+                      const icon = iconMap[cambio.accion] || '📌';
+
+                      return (
+                        <div key={cambio.id} className={styles.historialItem}>
+                          <div className={styles.historialIcon}>{icon}</div>
+                          <div className={styles.historialContent}>
+                            <div className={styles.historialHeader}>
+                              <span className={styles.historialUser}>
+                                {cambio.usuario?.nombre || 'Sistema'}
+                              </span>
+                              <span className={styles.historialRol}>
+                                {cambio.usuario?.rol || ''}
+                              </span>
+                            </div>
+                            <p className={styles.historialDetalle}>
+                              {cambio.detalle || cambio.accion}
+                            </p>
+                            <span className={styles.historialFecha}>
+                              {new Date(cambio.createdAt).toLocaleString('es-AR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>

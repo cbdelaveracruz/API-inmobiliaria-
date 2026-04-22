@@ -39,7 +39,7 @@ const PropiedadesList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit, setLimit] = useState(12);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -54,7 +54,7 @@ const PropiedadesList: React.FC = () => {
   useEffect(() => {
     loadPropiedades(page);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, user]);
+  }, [page, limit, user]);
 
   const loadPropiedades = async (pageToLoad: number) => {
     if (!user) return;
@@ -348,24 +348,43 @@ const PropiedadesList: React.FC = () => {
           </div>
 
           {/* Pagination */}
-          <div className={styles.pagination}>
-            <button
-              onClick={handlePrev}
-              disabled={page === 1}
-              className={styles.paginationBtn}
-            >
-              &lt; Anterior
-            </button>
-            <span className={styles.pageInfo}>
-              Página {page} de {totalPages}
-            </span>
-            <button
-              onClick={handleNext}
-              disabled={page === totalPages}
-              className={styles.paginationBtn}
-            >
-              Siguiente &gt;
-            </button>
+          <div className={styles.paginationWrapper}>
+            <div className={styles.limitSelector}>
+              <span className={styles.limitLabel}>Mostrar:</span>
+              <select 
+                value={limit}
+                onChange={(e) => {
+                  setLimit(Number(e.target.value));
+                  setPage(1);
+                }}
+                className={styles.limitSelect}
+              >
+                <option value={12}>12 por página</option>
+                <option value={24}>24 por página</option>
+                <option value={36}>36 por página</option>
+                <option value={10000}>Todas</option>
+              </select>
+            </div>
+
+            <div className={styles.pagination}>
+              <button
+                onClick={handlePrev}
+                disabled={page === 1}
+                className={styles.paginationBtn}
+              >
+                &lt; Anterior
+              </button>
+              <span className={styles.pageInfo}>
+                Página {page} de {totalPages}
+              </span>
+              <button
+                onClick={handleNext}
+                disabled={page === totalPages}
+                className={styles.paginationBtn}
+              >
+                Siguiente &gt;
+              </button>
+            </div>
           </div>
         </>
       )}

@@ -41,9 +41,9 @@ export const listarExpedientes = async (req: Request, res: Response) => {
             return;
         }
 
-        if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
+        if (isNaN(limitNum) || limitNum < 1) {
             res.status(400).json({
-                error: 'El parámetro "limit" debe ser un número entre 1 y 100'
+                error: 'El parámetro "limit" debe ser un número mayor a 0'
             });
             return;
         }

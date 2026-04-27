@@ -176,7 +176,7 @@ export const listarExpedientes = async (req: Request, res: Response) => {
                 }
             },
             orderBy: {
-                createdAt: 'desc'
+                updatedAt: 'desc'
             },
             skip,
             take: limitNum
@@ -322,7 +322,8 @@ export const crearExpediente = async (req: Request, res: Response) => {
             partidaInmobiliaria,
             localidad,
             emails,
-            propietarios 
+            propietarios,
+            tipoOperacion
         } = req.body;
 
         // Validación: el título es obligatorio
@@ -372,6 +373,7 @@ export const crearExpediente = async (req: Request, res: Response) => {
             data: {
                 titulo: titulo.trim(),
                 tipoPropiedad: tipoPropiedad?.trim() || null,
+                tipoOperacion: tipoOperacion?.trim() || null,
                 descripcion: descripcion?.trim() || null,
                 propietarioNombre: propietarioNombreAuto, // Auto-populado desde array
                 direccion: direccion && direccion.trim() ? direccion.trim() : null,

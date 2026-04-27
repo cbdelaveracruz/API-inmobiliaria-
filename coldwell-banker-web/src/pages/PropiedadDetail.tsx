@@ -68,6 +68,7 @@ interface Propiedad {
   partidaInmobiliaria?: string | null;
   emails?: string | null;
   tipoPropiedad?: string | null;
+  tipoOperacion?: string | null;
   propietarios: string;
   asesor: Asesor;
   asesorId: number;
@@ -508,6 +509,14 @@ const PropiedadDetail = () => {
               <div className={styles.infoItem}>
                 <span className={styles.infoLabel}>Localidad</span>
                 <span className={styles.infoValue}>{propiedad.localidad || '-'}</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Tipo de Propiedad</span>
+                <span className={styles.infoValue}>{propiedad.tipoPropiedad || '-'}</span>
+              </div>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Tipo de Operación</span>
+                <span className={styles.infoValue}>{propiedad.tipoOperacion || '-'}</span>
               </div>
               <div className={styles.infoItem}>
                 <span className={styles.infoLabel}>Partida Inmobiliaria</span>

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Home as HomeIcon, User, Calendar } from 'lucide-react';
-import { fetchExpedientes } from '../services/api';
+import { fetchExpedientes, obtenerAsesores, type Asesor } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import styles from './PropiedadesList.module.css';
 
@@ -50,11 +50,28 @@ const PropiedadesList: React.FC = () => {
   const [filtroFecha, setFiltroFecha] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [filtroEstado, setFiltroEstado] = useState<'TODOS' | 'APROBADO' | 'RECHAZADO' | 'PENDIENTE'>('TODOS');
+  const [asesores, setAsesores] = useState<Asesor[]>([]);
+  const [filtroAsesor, setFiltroAsesor] = useState<string>('TODOS');
+
+  // Cargar asesores si es ADMIN o REVISOR
+  useEffect(() => {
+    const loadAsesores = async () => {
+      if (user && (user.rol === 'ADMIN' || user.rol === 'REVISOR')) {
+        try {
+          const data = await obtenerAsesores();
+          setAsesores(data);
+        } catch (err) {
+          console.error('Error al cargar asesores:', err);
+        }
+      }
+    };
+    loadAsesores();
+  }, [user]);
 
   useEffect(() => {
     loadPropiedades(page);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit, user]);
+  }, [page, limit, user, filtroAsesor]);
 
   const loadPropiedades = async (pageToLoad: number) => {
     if (!user) return;
@@ -70,6 +87,8 @@ const PropiedadesList: React.FC = () => {
 
       if (user.rol === 'ASESOR') {
         params.asesorId = user.id;
+      } else if (filtroAsesor !== 'TODOS') {
+        params.asesorId = parseInt(filtroAsesor);
       }
 
       const response = await fetchExpedientes(params);
@@ -292,6 +311,31 @@ const PropiedadesList: React.FC = () => {
                   maxLength={10}
                 />
               </div>
+
+              {/* Filtro por Asesor (solo ADMIN/REVISOR) */}
+              {(user?.rol === 'ADMIN' || user?.rol === 'REVISOR') && (
+                <div className={styles.searchField}>
+                  <div className={styles.searchLabel}>
+                    <User size={20} className={styles.searchIcon} />
+                    <span>Filtrar por Asesor</span>
+                  </div>
+                  <select
+                    className={styles.searchInput}
+                    value={filtroAsesor}
+                    onChange={(e) => {
+                      setFiltroAsesor(e.target.value);
+                      setPage(1);
+                    }}
+                  >
+                    <option value="TODOS">Todos los asesores</option>
+                    {asesores.map((asesor) => (
+                      <option key={asesor.id} value={asesor.id}>
+                        {asesor.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           </div>
         )}

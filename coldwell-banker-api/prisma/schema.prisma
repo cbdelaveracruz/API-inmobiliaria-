@@ -7,7 +7,7 @@ generator client {
 // Base de datos PostgreSQL para Railway
 // En local podés seguir usando SQLite cambiando el provider temporalmente
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -39,6 +39,7 @@ model Expediente {
   id                  Int         @id @default(autoincrement())
   titulo              String // título o referencia del expediente (nombre de la propiedad)
   tipoPropiedad       String? // tipo de propiedad (casa, departamento, terreno, etc.)
+  tipoOperacion       String? // tipo de operación (Venta, Alquiler)
   descripcion         String? // descripción opcional
   propietarioNombre   String? // DEPRECATED: ahora se usa el array propietarios
   direccion           String? // dirección de la propiedad

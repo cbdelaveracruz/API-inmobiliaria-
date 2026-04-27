@@ -40,6 +40,7 @@ const NuevaPropiedad: React.FC = () => {
   
   const [titulo, setTitulo] = useState('');
   const [tipoPropiedad, setTipoPropiedad] = useState('');
+  const [tipoOperacion, setTipoOperacion] = useState('');
   const [direccion, setDireccion] = useState('');
   const [partidaInmobiliaria, setPartidaInmobiliaria] = useState('');
   const [localidad, setLocalidad] = useState('');
@@ -75,6 +76,7 @@ const NuevaPropiedad: React.FC = () => {
         // Cargar datos básicos
         setTitulo(data.titulo || '');
         setTipoPropiedad(data.tipoPropiedad || '');
+        setTipoOperacion(data.tipoOperacion || '');
         setDireccion(data.direccion || '');
         setPartidaInmobiliaria(data.partidaInmobiliaria || '');
         setLocalidad(data.localidad || '');
@@ -133,6 +135,7 @@ const NuevaPropiedad: React.FC = () => {
     // Sanitizar inputs
     const tituloSanitized = sanitizeString(titulo);
     const tipoSanitized = sanitizeString(tipoPropiedad);
+    const operacionSanitized = sanitizeString(tipoOperacion);
     const direccionSanitized = sanitizeString(direccion);
     const partidaSanitized = sanitizeString(partidaInmobiliaria);
     const localidadSanitized = sanitizeString(localidad);
@@ -142,8 +145,12 @@ const NuevaPropiedad: React.FC = () => {
       setError('El nombre de la propiedad debe tener entre 3 y 200 caracteres');
       return;
     }
-    if (!tipoSanitized || !validateLength(tipoSanitized, 2, 100)) {
-      setError('El tipo de propiedad debe tener entre 2 y 100 caracteres');
+    if (!tipoSanitized) {
+      setError('El tipo de propiedad es obligatorio');
+      return;
+    }
+    if (!operacionSanitized) {
+      setError('El tipo de operación es obligatorio');
       return;
     }
 
@@ -156,6 +163,7 @@ const NuevaPropiedad: React.FC = () => {
       const body: any = {
         titulo: tituloSanitized,
         tipoPropiedad: tipoSanitized,
+        tipoOperacion: operacionSanitized,
       };
 
       // En modo edición no enviamos estado
@@ -254,16 +262,50 @@ const NuevaPropiedad: React.FC = () => {
               <label htmlFor="tipoPropiedad" className={styles.label}>
                 Tipo de propiedad <span className={styles.required}>*</span>
               </label>
-              <input
+              <select
                 id="tipoPropiedad"
-                type="text"
                 value={tipoPropiedad}
                 onChange={(e) => setTipoPropiedad(e.target.value)}
                 disabled={loading}
                 className={styles.input}
-                placeholder="Ej: Casa, Departamento, Terreno"
-                maxLength={100}
-              />
+              >
+                <option value="">Seleccione un tipo...</option>
+                <option value="Terreno">Terreno</option>
+                <option value="Departamento">Departamento</option>
+                <option value="Casa">Casa</option>
+                <option value="Quinta">Quinta</option>
+                <option value="Oficina">Oficina</option>
+                <option value="Local">Local</option>
+                <option value="Edificio Comercial">Edificio Comercial</option>
+                <option value="Campo">Campo</option>
+                <option value="Cochera">Cochera</option>
+                <option value="PH">PH</option>
+                <option value="Depósito">Depósito</option>
+                <option value="Fondo de Comercio">Fondo de Comercio</option>
+                <option value="Finca">Finca</option>
+                <option value="Chacra">Chacra</option>
+                <option value="Isla">Isla</option>
+                <option value="Galpón">Galpón</option>
+                <option value="Terreno Comercial">Terreno Comercial</option>
+                <option value="Terreno Industrial">Terreno Industrial</option>
+              </select>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label htmlFor="tipoOperacion" className={styles.label}>
+                Tipo de Operación <span className={styles.required}>*</span>
+              </label>
+              <select
+                id="tipoOperacion"
+                value={tipoOperacion}
+                onChange={(e) => setTipoOperacion(e.target.value)}
+                disabled={loading}
+                className={styles.input}
+              >
+                <option value="">Seleccione una operación...</option>
+                <option value="Venta">Venta</option>
+                <option value="Alquiler">Alquiler</option>
+              </select>
             </div>
 
             <div className={styles.inputGroup}>

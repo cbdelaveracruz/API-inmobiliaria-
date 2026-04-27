@@ -206,6 +206,11 @@
   transition: all 0.3s;
 }
 
+.searchInput option {
+  background-color: #001a4d;
+  color: white;
+}
+
 .searchInput::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }

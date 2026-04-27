@@ -99,6 +99,11 @@
   transition: all 0.3s;
 }
 
+.input option {
+  background-color: #001a4d;
+  color: white;
+}
+
 .input::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }

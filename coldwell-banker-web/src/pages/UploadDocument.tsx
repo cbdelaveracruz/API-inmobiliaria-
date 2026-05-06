@@ -72,19 +72,20 @@ const UploadDocument: React.FC = () => {
 
     try {
       // Subir solo los archivos seleccionados
-      const uploads = [];
+      const uploads: { file: File; tipo: string; label: string }[] = [];
       
-      if (files.titulo) uploads.push({ file: files.titulo, tipo: 'ESCRITURA' });
-      if (files.dni) uploads.push({ file: files.dni, tipo: 'DNI' });
-      if (files.api) uploads.push({ file: files.api, tipo: 'API' });
-      if (files.tgi) uploads.push({ file: files.tgi, tipo: 'TGI' });
-      if (files.opcional) uploads.push({ file: files.opcional, tipo: 'OTRO' });
+      if (files.titulo) uploads.push({ file: files.titulo, tipo: 'ESCRITURA', label: 'Título de Propiedad' });
+      if (files.dni) uploads.push({ file: files.dni, tipo: 'DNI', label: 'DNI del Propietario' });
+      if (files.api) uploads.push({ file: files.api, tipo: 'API', label: 'API' });
+      if (files.tgi) uploads.push({ file: files.tgi, tipo: 'TGI', label: 'TGI' });
+      if (files.opcional) uploads.push({ file: files.opcional, tipo: 'OTRO', label: 'Otro documento' });
 
       // Subir todos los archivos
       for (const upload of uploads) {
         const formData = new FormData();
         formData.append('expedienteId', id);
         formData.append('tipo', upload.tipo);
+        formData.append('nombre', upload.label);
         formData.append('archivo', upload.file!);
 
         await api.post('/documentos', formData, {

@@ -143,12 +143,17 @@ const PropiedadDetail = () => {
   // Helper para formatear tipos de documentos
   const formatDocumentType = (tipo: string): string => {
     const tipos: Record<string, string> = {
-      'TITULO': '📄 Título de Propiedad',
-      'DNI': '📄 DNI del Propietario',
-      'API': '📄 API',
-      'TGI': '📄 TGI',
+      'ESCRITURA': '📄 Título / Escritura',
+      'DNI': '🆔 DNI del Propietario',
+      'API': '📑 API',
+      'TGI': '🏢 TGI',
+      'PLANOS': '📐 Planos',
+      'MENSURA': '📏 Mensura',
+      'TASA': '💰 Tasa',
+      'OTRO': '📎 Otro documento',
+      'PDF_COMPLETO': '📋 PDF Completo',
     };
-    return tipos[tipo] || tipo;
+    return tipos[tipo] || `📄 ${tipo}`;
   };
 
   useEffect(() => {

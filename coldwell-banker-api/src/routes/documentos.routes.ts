@@ -97,7 +97,15 @@ router.put('/:id',
 router.delete('/:id', autenticar, eliminarDocumento);
 
 import { descargarDocumento } from '../controllers/download.controller';
-// ... (rutas existentes) ...
+import { marcarDocumentoVisto } from '../controllers/expedientes.controller';
+
+/**
+ * POST /documentos/:id/marcar-visto
+ * Marca un documento como visto por el usuario actual
+ * Todos los usuarios autenticados pueden marcar sus propios vistos
+ */
+router.post('/:id/marcar-visto', autenticar, marcarDocumentoVisto);
+
 /**
  * GET /documentos/:id/download
  * Descarga un documento de forma segura validando permisos

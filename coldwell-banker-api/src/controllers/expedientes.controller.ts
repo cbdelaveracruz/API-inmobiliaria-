@@ -422,13 +422,14 @@ export const crearExpediente = async (req: Request, res: Response) => {
 
 /**
  * PUT /expedientes/:id/estado
- * Cambia el estado de un expediente (solo ADMIN)
- * Body: { 
+ * Cambia el estado de un expediente (ADMIN o REVISOR)
+ * Body: {
  *   estado: "PENDIENTE" | "APROBADO" | "RECHAZADO",
  *   observaciones?: string
  * }
  * - Si el nuevo estado es RECHAZADO, las observaciones son obligatorias
  * - Si el nuevo estado es APROBADO, se limpian las observaciones anteriores
+ * - Permite rechazar propiedades aprobadas (cambiar de APROBADO a RECHAZADO)
  */
 export const cambiarEstadoExpediente = async (req: Request, res: Response) => {
     try {
@@ -845,8 +846,8 @@ export const obtenerHistorial = async (req: Request, res: Response) => {
  * Actualiza los datos de un expediente
  *
  * Permisos:
- * - ASESOR: Solo puede editar sus propias propiedades en estado EN_PREPARACION o PENDIENTE
- * - ADMIN/REVISOR: Pueden editar cualquier propiedad PENDIENTE
+ * - ASESOR: Solo puede editar sus propias propiedades en estado EN_PREPARACION, PENDIENTE o RECHAZADO
+ * - ADMIN/REVISOR: Pueden editar cualquier propiedad PENDIENTE o APROBADO
  */
 export const actualizarExpediente = async (req: Request, res: Response) => {
   try {
@@ -887,10 +888,10 @@ export const actualizarExpediente = async (req: Request, res: Response) => {
       }
     }
 
-    // ADMIN/REVISOR: solo propiedades PENDIENTE (no APROBADO ni RECHAZADO)
+    // ADMIN/REVISOR: pueden editar PENDIENTE y APROBADO (no EN_PREPARACION ni RECHAZADO)
     if (usuario.rol === 'ADMIN' || usuario.rol === 'REVISOR') {
-      if (expedienteExistente.estado !== 'EN_PREPARACION' && expedienteExistente.estado !== 'PENDIENTE') {
-        res.status(400).json({ error: 'No se pueden editar propiedades aprobadas o rechazadas' });
+      if (expedienteExistente.estado !== 'PENDIENTE' && expedienteExistente.estado !== 'APROBADO') {
+        res.status(400).json({ error: 'No se pueden editar propiedades en preparación o rechazadas' });
         return;
       }
     }

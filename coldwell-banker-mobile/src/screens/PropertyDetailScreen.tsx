@@ -61,10 +61,21 @@ const PropertyDetailScreen = ({ route, navigation }: Props) => {
   const handleUpdateStatus = async () => {
     if (!property) return;
 
+    // Validar observaciones si se rechaza
+    if (selectedStatus === PropertyStatus.REJECTED && !observaciones.trim()) {
+      Alert.alert(
+        'Observaciones requeridas',
+        'Las observaciones son obligatorias cuando se rechaza una propiedad',
+        [{ text: 'Aceptar' }]
+      );
+      return;
+    }
+
     setIsSaving(true);
     try {
       const updateData: UpdatePropertyStatusDto = {
         estado: selectedStatus,
+        observaciones: observaciones.trim() || undefined,
       };
 
       await propertiesApi.updatePropertyStatus(property.id, updateData);
@@ -249,8 +260,8 @@ const PropertyDetailScreen = ({ route, navigation }: Props) => {
         )}
       </View>
 
-      {/* Sección ADMIN: Cambiar estado */}
-      {role === UserRole.ADMIN && (
+      {/* Sección ADMIN/REVISOR: Cambiar estado */}
+      {(role === UserRole.ADMIN || role === UserRole.REVISOR) && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Administración</Text>
           

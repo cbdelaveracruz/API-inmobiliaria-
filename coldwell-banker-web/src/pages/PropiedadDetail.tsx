@@ -114,10 +114,10 @@ const PropiedadDetail = () => {
 
   // Verificar si el usuario puede editar la propiedad
   // Asesores pueden editar EN_PREPARACION, PENDIENTE y RECHAZADO (si es suya)
-  // ADMIN/REVISOR pueden editar PENDIENTE o EN_PREPARACION
+  // ADMIN/REVISOR pueden editar PENDIENTE o APROBADO
   const userRol = user?.rol?.toUpperCase();
-  const canEditProperty = 
-    ((propiedad?.estado === 'EN_PREPARACION' || propiedad?.estado === 'PENDIENTE') && (userRol === 'ADMIN' || userRol === 'REVISOR')) ||
+  const canEditProperty =
+    ((propiedad?.estado === 'PENDIENTE' || propiedad?.estado === 'APROBADO') && (userRol === 'ADMIN' || userRol === 'REVISOR')) ||
     ((propiedad?.estado === 'EN_PREPARACION' || propiedad?.estado === 'PENDIENTE' || propiedad?.estado === 'RECHAZADO') && (userRol === 'ASESOR' && (propiedad?.asesor?.id == user?.id || propiedad?.asesorId == user?.id)));
 
   console.log('DEBUG [PropiedadDetail]:', {
@@ -476,22 +476,22 @@ const PropiedadDetail = () => {
           </p>
 
           {/* Admin Actions - Aprobar/Rechazar (condicional según estado) */}
-          {canChangeStatus && propiedad.estado !== 'APROBADO' && (
+          {canChangeStatus && (
             <div className={styles.adminActions}>
               {/* Mostrar botón Aprobar si está PENDIENTE o RECHAZADO */}
               {(propiedad.estado === 'PENDIENTE' || propiedad.estado === 'RECHAZADO') && (
-                <button 
-                  onClick={() => setShowModal(true)} 
+                <button
+                  onClick={() => setShowModal(true)}
                   className={styles.approveButton}
                 >
                   ✅ Aprobar Propiedad
                 </button>
               )}
-              
-              {/* Mostrar botón Rechazar SOLO si está PENDIENTE */}
-              {propiedad.estado === 'PENDIENTE' && (
-                <button 
-                  onClick={() => setShowModal(true)} 
+
+              {/* Mostrar botón Rechazar si está PENDIENTE o APROBADO */}
+              {(propiedad.estado === 'PENDIENTE' || propiedad.estado === 'APROBADO') && (
+                <button
+                  onClick={() => setShowModal(true)}
                   className={styles.rejectButton}
                 >
                   ❌ Rechazar Propiedad

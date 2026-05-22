@@ -7,7 +7,7 @@ interface ChangeStatusModalProps {
   expedienteId: number;
   estadoActual: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
   onClose: () => void;
-  onSuccess: (nuevoEstado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO', nuevasObservaciones: string | null) => void;
+  onSuccess: (nuevoEstado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO', nuevasObservaciones: string | null, nuevosComentariosRevisor?: string | null) => void;
 }
 
 const ChangeStatusModal: React.FC<ChangeStatusModalProps> = ({
@@ -18,6 +18,7 @@ const ChangeStatusModal: React.FC<ChangeStatusModalProps> = ({
 }) => {
   const [nuevoEstado, setNuevoEstado] = useState<'PENDIENTE' | 'APROBADO' | 'RECHAZADO'>(estadoActual);
   const [observaciones, setObservaciones] = useState('');
+  const [comentariosRevisor, setComentariosRevisor] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -37,12 +38,13 @@ const ChangeStatusModal: React.FC<ChangeStatusModalProps> = ({
       const body = {
         estado: nuevoEstado,
         observaciones: nuevoEstado === 'APROBADO' ? null : observaciones.trim() || null,
+        comentariosRevisor: nuevoEstado === 'APROBADO' ? comentariosRevisor.trim() || null : null,
       };
 
       await api.put(`/expedientes/${expedienteId}/estado`, body);
 
       // Llamar al callback de éxito
-      onSuccess(nuevoEstado, body.observaciones);
+      onSuccess(nuevoEstado, body.observaciones, body.comentariosRevisor);
     } catch (err: any) {
       setError(
         err?.response?.data?.error ||
@@ -100,27 +102,45 @@ const ChangeStatusModal: React.FC<ChangeStatusModalProps> = ({
             </select>
           </div>
 
-          <div className={styles.inputGroup}>
-            <label htmlFor="observaciones" className={styles.inputLabel}>
-              Observaciones
-              {nuevoEstado === 'RECHAZADO' && (
-                <span className={styles.required}> (obligatorio)</span>
-              )}
-            </label>
-            <textarea
-              id="observaciones"
-              value={observaciones}
-              onChange={(e) => setObservaciones(e.target.value)}
-              className={styles.textarea}
-              rows={4}
-              placeholder={
-                nuevoEstado === 'RECHAZADO'
-                  ? 'Indicá el motivo del rechazo...'
-                  : 'Observaciones adicionales (opcional)'
-              }
-              disabled={loading}
-            />
-          </div>
+          {nuevoEstado === 'APROBADO' ? (
+            <div className={styles.inputGroup}>
+              <label htmlFor="comentariosRevisor" className={styles.inputLabel}>
+                Comentario de aprobación
+                <span className={styles.optional}> (opcional)</span>
+              </label>
+              <textarea
+                id="comentariosRevisor"
+                value={comentariosRevisor}
+                onChange={(e) => setComentariosRevisor(e.target.value)}
+                className={styles.textarea}
+                rows={4}
+                placeholder="Podés dejar un comentario sobre la aprobación..."
+                disabled={loading}
+              />
+            </div>
+          ) : (
+            <div className={styles.inputGroup}>
+              <label htmlFor="observaciones" className={styles.inputLabel}>
+                Observaciones
+                {nuevoEstado === 'RECHAZADO' && (
+                  <span className={styles.required}> (obligatorio)</span>
+                )}
+              </label>
+              <textarea
+                id="observaciones"
+                value={observaciones}
+                onChange={(e) => setObservaciones(e.target.value)}
+                className={styles.textarea}
+                rows={4}
+                placeholder={
+                  nuevoEstado === 'RECHAZADO'
+                    ? 'Indicá el motivo del rechazo...'
+                    : 'Observaciones adicionales (opcional)'
+                }
+                disabled={loading}
+              />
+            </div>
+          )}
 
           {error && (
             <div className={styles.error}>

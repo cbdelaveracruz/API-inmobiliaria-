@@ -116,8 +116,8 @@ const PropiedadDetail = () => {
   // Asesores pueden editar EN_PREPARACION, PENDIENTE y RECHAZADO (si es suya)
   // ADMIN/REVISOR pueden editar PENDIENTE o EN_PREPARACION
   const userRol = user?.rol?.toUpperCase();
-  const canEditProperty = 
-    ((propiedad?.estado === 'EN_PREPARACION' || propiedad?.estado === 'PENDIENTE') && (userRol === 'ADMIN' || userRol === 'REVISOR')) ||
+  const canEditProperty =
+    ((propiedad?.estado === 'EN_PREPARACION' || propiedad?.estado === 'PENDIENTE' || propiedad?.estado === 'APROBADO') && (userRol === 'ADMIN' || userRol === 'REVISOR')) ||
     ((propiedad?.estado === 'EN_PREPARACION' || propiedad?.estado === 'PENDIENTE' || propiedad?.estado === 'RECHAZADO') && (userRol === 'ASESOR' && (propiedad?.asesor?.id == user?.id || propiedad?.asesorId == user?.id)));
 
   console.log('DEBUG [PropiedadDetail]:', {
@@ -327,12 +327,13 @@ const PropiedadDetail = () => {
     }
   };
 
-  const handleStatusChange = (nuevoEstado: 'EN_PREPARACION' | 'PENDIENTE' | 'APROBADO' | 'RECHAZADO', observaciones: string | null) => {
+  const handleStatusChange = (nuevoEstado: 'EN_PREPARACION' | 'PENDIENTE' | 'APROBADO' | 'RECHAZADO', observaciones: string | null, comentariosRevisor?: string | null) => {
     // Actualizar el estado local de la propiedad sin recargar toda la página
     setPropiedad(prev => prev ? {
       ...prev,
       estado: nuevoEstado,
-      observaciones
+      observaciones,
+      ...(comentariosRevisor !== undefined && { comentariosRevisor })
     } : null);
     
     // Mostrar mensaje de éxito
@@ -475,26 +476,36 @@ const PropiedadDetail = () => {
             Propietario/s: <strong>{propiedad.propietarioNombre}</strong>
           </p>
 
-          {/* Admin Actions - Aprobar/Rechazar (condicional según estado) */}
-          {canChangeStatus && propiedad.estado !== 'APROBADO' && (
+          {/* Admin Actions - Aprobar/Rechazar/Revertir (condicional según estado) */}
+          {canChangeStatus && (
             <div className={styles.adminActions}>
               {/* Mostrar botón Aprobar si está PENDIENTE o RECHAZADO */}
               {(propiedad.estado === 'PENDIENTE' || propiedad.estado === 'RECHAZADO') && (
-                <button 
-                  onClick={() => setShowModal(true)} 
+                <button
+                  onClick={() => setShowModal(true)}
                   className={styles.approveButton}
                 >
                   ✅ Aprobar Propiedad
                 </button>
               )}
-              
+
               {/* Mostrar botón Rechazar SOLO si está PENDIENTE */}
               {propiedad.estado === 'PENDIENTE' && (
-                <button 
-                  onClick={() => setShowModal(true)} 
+                <button
+                  onClick={() => setShowModal(true)}
                   className={styles.rejectButton}
                 >
                   ❌ Rechazar Propiedad
+                </button>
+              )}
+
+              {/* Mostrar botón Revertir si está APROBADO (solo ADMIN/REVISOR) */}
+              {propiedad.estado === 'APROBADO' && (
+                <button
+                  onClick={() => setShowModal(true)}
+                  className={styles.rejectButton}
+                >
+                  ↩️ Revertir a Rechazado
                 </button>
               )}
             </div>
@@ -529,6 +540,19 @@ const PropiedadDetail = () => {
               </div>
             </div>
           </div>
+
+          {/* 💬 Comentario del Revisor al aprobar */}
+          {propiedad.estado === 'APROBADO' && propiedad.comentariosRevisor && (
+            <div className={styles.observacionesSection} style={{ borderLeftColor: '#10b981', background: 'rgba(16,185,129,0.07)' }}>
+              <div className={styles.observacionesHeader}>
+                <span className={styles.observacionesIcon}>💬</span>
+                <h3 className={styles.sectionTitle}>Comentario del Revisor</h3>
+              </div>
+              <p className={styles.observacionesTexto}>
+                {propiedad.comentariosRevisor}
+              </p>
+            </div>
+          )}
 
           {/* ⚠️ Observaciones del Revisor */}
           {propiedad.estado === 'RECHAZADO' && propiedad.observaciones && (

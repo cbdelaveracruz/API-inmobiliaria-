@@ -433,7 +433,7 @@ export const crearExpediente = async (req: Request, res: Response) => {
 export const cambiarEstadoExpediente = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { estado, observaciones } = req.body;
+        const { estado, observaciones, comentariosRevisor } = req.body;
         const expedienteId = parseInt(id);
 
         // Validar ID
@@ -492,9 +492,10 @@ export const cambiarEstadoExpediente = async (req: Request, res: Response) => {
         if (estado === 'RECHAZADO') {
             datosActualizacion.observaciones = observaciones.trim();
         }
-        // Si el estado es APROBADO, limpiar las observaciones
+        // Si el estado es APROBADO, limpiar observaciones y guardar comentario del revisor (opcional)
         else if (estado === 'APROBADO') {
             datosActualizacion.observaciones = null;
+            datosActualizacion.comentariosRevisor = comentariosRevisor?.trim() || null;
         }
         // Si el estado es PENDIENTE, mantener las observaciones si vienen
         else if (estado === 'PENDIENTE' && observaciones) {
@@ -522,6 +523,9 @@ export const cambiarEstadoExpediente = async (req: Request, res: Response) => {
         let detalleHistorial = `Cambió estado de ${estadoAnterior} a ${estado}`;
         if (estado === 'RECHAZADO' && observaciones) {
             detalleHistorial += `. Observaciones: ${observaciones.trim()}`;
+        }
+        if (estado === 'APROBADO' && comentariosRevisor?.trim()) {
+            detalleHistorial += `. Comentario: ${comentariosRevisor.trim()}`;
         }
         await prisma.historialCambio.create({
             data: {
@@ -887,10 +891,10 @@ export const actualizarExpediente = async (req: Request, res: Response) => {
       }
     }
 
-    // ADMIN/REVISOR: solo propiedades PENDIENTE (no APROBADO ni RECHAZADO)
+    // ADMIN/REVISOR: pueden editar EN_PREPARACION, PENDIENTE y APROBADO (no RECHAZADO)
     if (usuario.rol === 'ADMIN' || usuario.rol === 'REVISOR') {
-      if (expedienteExistente.estado !== 'EN_PREPARACION' && expedienteExistente.estado !== 'PENDIENTE') {
-        res.status(400).json({ error: 'No se pueden editar propiedades aprobadas o rechazadas' });
+      if (expedienteExistente.estado === 'RECHAZADO') {
+        res.status(400).json({ error: 'No se pueden editar propiedades rechazadas. Cambiá el estado primero.' });
         return;
       }
     }

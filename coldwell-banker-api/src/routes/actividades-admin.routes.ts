@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { autenticar, esAdmin } from '../middlewares/auth.middleware';
+import { autenticar, esAdmin, esAdminORevisor } from '../middlewares/auth.middleware';
 import {
   obtenerActividadesSemanaAdmin,
   obtenerAsesores,
@@ -10,7 +10,7 @@ const router = Router();
 
 // Rutas admin (requieren autenticación + rol ADMIN)
 router.get('/actividades-semanales', autenticar, esAdmin, obtenerActividadesSemanaAdmin);
-router.get('/asesores', autenticar, esAdmin, obtenerAsesores);
+router.get('/asesores', autenticar, esAdminORevisor, obtenerAsesores);
 router.get('/actividades-semanales/export', autenticar, esAdmin, exportarActividadesExcel);
 
 export default router;
